@@ -1,0 +1,346 @@
+\part{Глава №2. Основы архитектуры, операционных систем и инструментов программиста.}
+
+\chapter{Тема №3. Основы архитектуры компьютера.}
+\section{Лекция №4. Как устроен компьютер и где исполняется программа.}
+
+\subsection*{Цель занятия}
+Показать, из каких основных частей состоит компьютер, где хранятся данные и команды, и почему будущему программисту на C и NASM нужно понимать память, адреса и регистры.
+
+\subsection*{Обязательные темы}
+\begin{itemize}
+    \item CPU, RAM, SSD/HDD, GPU: роли основных компонентов компьютера.
+    \item Бит, байт, машинное слово, адрес, адресное пространство.
+    \item Регистр процессора как самая быстрая рабочая память CPU.
+    \item Оперативная память как массив байтов с адресами.
+    \item Отличие хранения программы на диске от исполнения программы в памяти.
+    \item Стек и куча на уровне идеи: где появляются локальные переменные и динамические данные.
+    \item Связь с C: переменная, указатель, массив, размер типа.
+    \item Связь с NASM: регистры, инструкции, обращение к памяти.
+\end{itemize}
+
+\subsection*{Усложнённые темы}
+\begin{itemize}
+    \item Иерархия памяти: регистры, кэш, RAM, SSD/HDD.
+    \item Почему доступ к разным уровням памяти имеет разную стоимость.
+    \item Кэш-линии и локальность данных на уровне общей идеи.
+    \item Порядок байт в памяти: little-endian и big-endian.
+    \item Виртуальная память и страницы как подготовка к теме операционных систем.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item x86-64 / AMD64.
+    \item Register, memory, address, stack, heap.
+    \item \texttt{sizeof}, адрес переменной, указатель.
+    \item \texttt{hexdump}, \texttt{xxd}, \texttt{objdump} как инструменты для демонстрации представления данных.
+\end{itemize}
+
+\newpage
+\section{Семинар №4. Память, адреса и представление данных.}
+
+\subsection*{Цель занятия}
+Закрепить представление о памяти как о последовательности байтов и связать это представление с простыми программами на C.
+
+\subsection*{Обязательные задания}
+\begin{itemize}
+    \item Определить размер базовых типов C с помощью \texttt{sizeof}.
+    \item Нарисовать размещение массива \texttt{char}, \texttt{int} и \texttt{long} в памяти.
+    \item По адресу начала массива и размеру элемента вычислять адрес элемента с заданным индексом.
+    \item Разобрать, чем отличаются значение переменной и адрес переменной.
+    \item Составить таблицу: тип данных, размер, пример значения, возможное машинное представление.
+\end{itemize}
+
+\subsection*{Усложнённые задания}
+\begin{itemize}
+    \item Посмотреть байты целого числа в памяти и объяснить порядок байт.
+    \item Разобрать размещение полей простой структуры C.
+    \item Найти padding и выравнивание в структуре с полями разных типов.
+    \item Сравнить содержимое памяти до и после изменения значения переменной.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item \texttt{gcc} для сборки демонстрационных программ.
+    \item \texttt{printf}, \texttt{sizeof}, оператор \texttt{\&} в C.
+    \item \texttt{gdb}, \texttt{x/xb}, \texttt{x/xw} как дополнительные инструменты просмотра памяти.
+\end{itemize}
+
+\newpage
+\chapter{Тема №4. Операционная система и запуск программы.}
+\section{Лекция №5. Операционная система и запуск программы.}
+
+\subsection*{Цель занятия}
+Объяснить, зачем нужна операционная система и что происходит между запуском исполняемого файла и выполнением инструкций процессором.
+
+\subsection*{Обязательные темы}
+\begin{itemize}
+    \item Задачи операционной системы: процессы, память, файлы, устройства, права доступа.
+    \item Программа как файл на диске и процесс как выполняющийся экземпляр программы.
+    \item Загрузка программы в память и передача управления начальной точке исполнения.
+    \item Аргументы командной строки и переменные окружения.
+    \item Стандартные потоки: \texttt{stdin}, \texttt{stdout}, \texttt{stderr}.
+    \item Код завершения программы.
+    \item Права доступа к файлам и исполняемый бит.
+    \item Отличия Windows, Linux и macOS с точки зрения программиста.
+\end{itemize}
+
+\subsection*{Усложнённые темы}
+\begin{itemize}
+    \item Формат исполняемых файлов ELF.
+    \item Системные вызовы как интерфейс между программой и ОС.
+    \item Пользовательский режим и режим ядра.
+    \item Изоляция процессов и виртуальное адресное пространство.
+    \item Динамическая загрузка библиотек на уровне общей идеи.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item Linux process model.
+    \item ELF, loader, syscall.
+    \item \texttt{file}, \texttt{chmod}, \texttt{./program}, \texttt{echo \$?}.
+    \item \texttt{ps}, \texttt{top}, \texttt{strace} как дополнительные инструменты наблюдения.
+\end{itemize}
+
+\newpage
+\section{Семинар №5. Процессы, файлы и стандартные потоки в Linux.}
+
+\subsection*{Цель занятия}
+Научиться запускать программы в Linux, понимать базовые ошибки запуска и пользоваться стандартными потоками ввода-вывода.
+
+\subsection*{Обязательные задания}
+\begin{itemize}
+    \item Запустить готовую программу из текущего каталога через \texttt{./program}.
+    \item Проверить тип файла командой \texttt{file}.
+    \item Сделать файл исполняемым с помощью \texttt{chmod +x}.
+    \item Передать программе аргументы командной строки.
+    \item Перенаправить вывод в файл с помощью \texttt{>}.
+    \item Передать файл на вход программе с помощью \texttt{<}.
+    \item Соединить две команды через пайп \texttt{|}.
+    \item Проверить код завершения последней команды через \texttt{echo \$?}.
+\end{itemize}
+
+\subsection*{Усложнённые задания}
+\begin{itemize}
+    \item Найти запущенный процесс через \texttt{ps}.
+    \item Посмотреть системные вызовы простой программы через \texttt{strace}.
+    \item Диагностировать ошибки \texttt{permission denied}, \texttt{command not found}, \texttt{no such file or directory}.
+    \item Сравнить обычный вывод и поток ошибок при перенаправлении.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item \texttt{stdin}, \texttt{stdout}, \texttt{stderr}.
+    \item Exit code.
+    \item \texttt{chmod}, \texttt{ps}, \texttt{strace}.
+\end{itemize}
+
+\newpage
+\chapter{Тема №5. Linux как рабочая среда программиста.}
+\section{Лекция №6. Терминал, shell и файловая система Linux.}
+
+\subsection*{Цель занятия}
+Дать минимальную модель Linux-среды, достаточную для выполнения учебных заданий, сборки программ и самостоятельной диагностики типовых проблем.
+
+\subsection*{Обязательные темы}
+\begin{itemize}
+    \item Гипервизор, виртуальная машина, WSL2 и Docker: зачем нужны изолированные среды.
+    \item Терминал и shell: кто читает команду пользователя.
+    \item Файловая система Linux: корень \texttt{/}, домашний каталог, текущий каталог.
+    \item Абсолютные и относительные пути.
+    \item Каталоги \texttt{/home}, \texttt{/bin}, \texttt{/usr}, \texttt{/tmp} на уровне пользователя.
+    \item Переменная окружения \texttt{PATH}.
+    \item Работа с документацией через \texttt{man} и \texttt{--help}.
+\end{itemize}
+
+\subsection*{Усложнённые темы}
+\begin{itemize}
+    \item Пользователи, группы и права доступа.
+    \item Символические ссылки.
+    \item Устройство \texttt{/proc} как окна в состояние системы.
+    \item Основы shell-скриптов: переменные, последовательность команд, код завершения.
+    \item Отличие контейнера от виртуальной машины.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item Ubuntu LTS как базовая учебная Linux-среда.
+    \item Bash.
+    \item VM, WSL2, Docker.
+    \item \texttt{PATH}, current working directory, home directory.
+\end{itemize}
+
+\newpage
+\section{Семинар №6. Навигация, поиск и работа с текстом.}
+
+\subsection*{Цель занятия}
+Отработать минимальный набор команд Linux, который нужен для работы с исходным кодом, файлами заданий и выводом программ.
+
+\subsection*{Обязательные задания}
+\begin{itemize}
+    \item Узнать текущий каталог командой \texttt{pwd}.
+    \item Перейти в другой каталог командой \texttt{cd}.
+    \item Посмотреть содержимое каталога командой \texttt{ls}.
+    \item Создать каталог и файл командами \texttt{mkdir} и \texttt{touch}.
+    \item Скопировать, переместить и удалить файлы командами \texttt{cp}, \texttt{mv}, \texttt{rm}.
+    \item Просмотреть текстовый файл с помощью \texttt{less}.
+    \item Найти строки в файле с помощью \texttt{grep}.
+    \item Найти файл по имени с помощью \texttt{find}.
+    \item Посчитать строки, слова или байты с помощью \texttt{wc}.
+\end{itemize}
+
+\subsection*{Усложнённые задания}
+\begin{itemize}
+    \item Построить простой пайплайн из нескольких команд.
+    \item Использовать регулярное выражение в \texttt{grep}.
+    \item Найти все файлы с расширением \texttt{.c} или \texttt{.asm} в дереве каталогов.
+    \item Написать небольшой shell-скрипт для запуска серии команд.
+    \item Использовать \texttt{xargs} для обработки списка файлов.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item \texttt{pwd}, \texttt{ls}, \texttt{cd}, \texttt{mkdir}, \texttt{touch}.
+    \item \texttt{cp}, \texttt{mv}, \texttt{rm}.
+    \item \texttt{less}, \texttt{grep}, \texttt{find}, \texttt{wc}, \texttt{head}, \texttt{tail}.
+    \item Redirection, pipe, glob pattern.
+\end{itemize}
+
+\newpage
+\chapter{Тема №6. Сборка программ и инструменты разработки.}
+\section{Лекция №7. От исходного кода к исполняемому файлу.}
+
+\subsection*{Цель занятия}
+Показать путь от исходного текста программы до исполняемого файла и подготовить студентов к сборке программ на C и NASM.
+
+\subsection*{Обязательные темы}
+\begin{itemize}
+    \item Исходный файл, объектный файл, исполняемый файл.
+    \item Этапы сборки C-программы: препроцессор, компилятор, ассемблер, линковщик.
+    \item Заголовочные файлы и единицы трансляции.
+    \item Что делает \texttt{gcc} при обычном запуске.
+    \item Что делает \texttt{nasm} при сборке ассемблерного файла.
+    \item Зачем нужен линковщик.
+    \item Зачем нужен \texttt{make} и файл \texttt{Makefile}.
+    \item Типовые ошибки: ошибка компиляции, ошибка ассемблирования, ошибка линковки.
+\end{itemize}
+
+\subsection*{Усложнённые темы}
+\begin{itemize}
+    \item Секции исполняемого файла: \texttt{.text}, \texttt{.data}, \texttt{.bss}.
+    \item Символы и таблица символов.
+    \item Статическая и динамическая линковка на уровне общей идеи.
+    \item ABI и соглашение о вызовах как мост между C и ассемблером.
+    \item Отладочная информация и флаг \texttt{-g}.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item \texttt{gcc}, \texttt{nasm}, \texttt{ld}, \texttt{make}.
+    \item \texttt{Makefile}.
+    \item \texttt{objdump}, \texttt{readelf}, \texttt{nm}.
+    \item \texttt{gdb} как будущий инструмент отладки.
+\end{itemize}
+
+\newpage
+\section{Семинар №7. Сборка C- и NASM-программ.}
+
+\subsection*{Цель занятия}
+Научиться собирать простые программы вручную и через \texttt{Makefile}, а также отличать ошибки компиляции от ошибок линковки.
+
+\subsection*{Обязательные задания}
+\begin{itemize}
+    \item Собрать программу \texttt{hello.c} командой \texttt{gcc hello.c -o hello}.
+    \item Запустить получившийся исполняемый файл.
+    \item Разделить C-программу на два исходных файла и собрать их вместе.
+    \item Получить объектный файл с помощью \texttt{gcc -c}.
+    \item Написать минимальный \texttt{Makefile} с целями \texttt{all} и \texttt{clean}.
+    \item Собрать простую NASM-программу в объектный файл.
+    \item Слинковать объектный файл в исполняемый файл.
+\end{itemize}
+
+\subsection*{Усложнённые задания}
+\begin{itemize}
+    \item Посмотреть секции исполняемого файла через \texttt{readelf -S}.
+    \item Посмотреть дизассемблирование через \texttt{objdump -d}.
+    \item Найти символы через \texttt{nm}.
+    \item Запустить программу под \texttt{gdb} и поставить точку останова на \texttt{main}.
+    \item Специально вызвать ошибку линковки и объяснить её текст.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item \texttt{gcc -c}, \texttt{gcc -o}.
+    \item \texttt{nasm -f elf64}.
+    \item \texttt{make}, \texttt{Makefile}, цель сборки.
+    \item Object file, executable file, linker error.
+\end{itemize}
+
+\newpage
+\chapter{Тема №7. Основы Git и командной разработки.}
+\section{Лекция №8. Система контроля версий Git.}
+
+\subsection*{Цель занятия}
+Объяснить, зачем программисту система контроля версий, и дать модель Git, достаточную для учебных проектов и домашних заданий.
+
+\subsection*{Обязательные темы}
+\begin{itemize}
+    \item Зачем нужна система контроля версий.
+    \item Репозиторий, рабочая директория, индекс, коммит.
+    \item История изменений и идентификатор коммита.
+    \item Локальный и удалённый репозиторий.
+    \item Ветка как линия разработки.
+    \item Что такое конфликт и почему он возникает.
+    \item Минимальная дисциплина работы: маленькие коммиты, понятные сообщения, не коммитить артефакты сборки.
+\end{itemize}
+
+\subsection*{Усложнённые темы}
+\begin{itemize}
+    \item Merge и rebase на уровне идеи.
+    \item Pull request / merge request как способ проверки изменений.
+    \item \texttt{.gitignore} и исключение временных файлов.
+    \item Работа с несколькими ветками.
+    \item Как читать \texttt{git diff} перед коммитом.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item Git.
+    \item GitHub или GitLab как удалённый хостинг репозиториев.
+    \item Commit, branch, remote, conflict.
+    \item \texttt{.gitignore}.
+\end{itemize}
+
+\newpage
+\section{Семинар №8. Минимальный рабочий цикл Git.}
+
+\subsection*{Цель занятия}
+Отработать базовый цикл работы с репозиторием: изменить файл, проверить изменения, сделать коммит и отправить его в удалённый репозиторий.
+
+\subsection*{Обязательные задания}
+\begin{itemize}
+    \item Создать локальный репозиторий командой \texttt{git init}.
+    \item Проверить состояние рабочей директории командой \texttt{git status}.
+    \item Добавить файл в индекс командой \texttt{git add}.
+    \item Сделать коммит командой \texttt{git commit}.
+    \item Посмотреть историю через \texttt{git log}.
+    \item Посмотреть изменения через \texttt{git diff}.
+    \item Склонировать удалённый репозиторий командой \texttt{git clone}.
+    \item Получить и отправить изменения через \texttt{git pull} и \texttt{git push}.
+\end{itemize}
+
+\subsection*{Усложнённые задания}
+\begin{itemize}
+    \item Создать ветку и переключиться на неё с помощью \texttt{git branch} и \texttt{git switch}.
+    \item Слить ветку обратно в основную.
+    \item Создать учебный конфликт и разрешить его вручную.
+    \item Написать \texttt{.gitignore} для проекта на C.
+    \item Проверить изменения перед коммитом и убрать из коммита лишние файлы.
+\end{itemize}
+
+\subsection*{Ключевые технологии и понятия}
+\begin{itemize}
+    \item \texttt{git init}, \texttt{git status}, \texttt{git add}, \texttt{git commit}.
+    \item \texttt{git log}, \texttt{git diff}.
+    \item \texttt{git clone}, \texttt{git pull}, \texttt{git push}.
+    \item \texttt{git branch}, \texttt{git switch}, \texttt{git merge}.
+\end{itemize}
