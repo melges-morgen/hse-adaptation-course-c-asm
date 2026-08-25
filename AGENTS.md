@@ -21,7 +21,7 @@ The materials are written in Russian. Keep the language of course content Russia
 - `drafts/adaptation_course_combined_draft.tex` is a shorter combined draft. Do not treat it as canonical unless the user explicitly says so.
 - `Dockerfile` defines the Docker image used for LaTeX builds.
 - `Makefile` provides the local Docker-based build target.
-- `.github/workflows/build-pdf.yml` builds the PDF in GitHub Actions and uploads it as an artifact.
+- `.github/workflows/build-pdf.yml` builds the PDF in GitHub Actions, uploads versioned artifacts, publishes the latest master PDF to GitHub Pages, and attaches release PDFs to GitHub Releases.
 
 ## Content Guidelines
 

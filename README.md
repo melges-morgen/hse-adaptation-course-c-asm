@@ -65,7 +65,33 @@ make clean
 
 - собирает Docker-образ;
 - запускает LaTeX-сборку через `make pdf`;
-- публикует PDF как artifact `adaptation-course-pdf`.
+- публикует PDF как artifact;
+- при сборке ветки `master` публикует актуальную версию PDF через GitHub Pages;
+- при публикации GitHub Release прикрепляет PDF к релизу.
+
+Для регулярных сборок имя artifact содержит номер сборки, дату-время в UTC и короткий SHA коммита:
+
+```text
+adaptation-course-master-build-<run_number>-<YYYYMMDD-HHMMSSZ>-<short_sha>
+```
+
+PDF внутри artifact называется аналогично:
+
+```text
+adaptation_course-master-build-<run_number>-<YYYYMMDD-HHMMSSZ>-<short_sha>.pdf
+```
+
+Для GitHub Pages публикуется актуальная версия:
+
+```text
+adaptation_course-latest.pdf
+```
+
+Для релизов версия берётся из тега релиза, например:
+
+```text
+adaptation_course-v1.0.0.pdf
+```
 
 ## Основной файл
 

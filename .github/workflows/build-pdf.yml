@@ -2,9 +2,20 @@ name: Build PDF
 
 on:
   push:
-    branches: [main, master]
+    branches: [master]
   pull_request:
+  release:
+    types: [published]
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build-pdf:
@@ -17,8 +28,81 @@ jobs:
       - name: Build PDF
         run: make pdf
 
+      - name: Prepare build metadata
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          BUILD_DATETIME="$(date -u +'%Y%m%d-%H%M%SZ')"
+
+          case "$EVENT_NAME" in
+            release)
+              BUILD_VERSION="$RELEASE_TAG"
+              ;;
+            pull_request)
+              BUILD_VERSION="pr-${PR_NUMBER}-build-${GITHUB_RUN_NUMBER}-${BUILD_DATETIME}-${SHORT_SHA}"
+              ;;
+            workflow_dispatch)
+              BUILD_VERSION="manual-build-${GITHUB_RUN_NUMBER}-${BUILD_DATETIME}-${SHORT_SHA}"
+              ;;
+            *)
+              BUILD_VERSION="master-build-${GITHUB_RUN_NUMBER}-${BUILD_DATETIME}-${SHORT_SHA}"
+              ;;
+          esac
+
+          echo "SHORT_SHA=$SHORT_SHA" >> "$GITHUB_ENV"
+          echo "BUILD_DATETIME=$BUILD_DATETIME" >> "$GITHUB_ENV"
+          echo "BUILD_VERSION=$BUILD_VERSION" >> "$GITHUB_ENV"
+          echo "PDF_NAME=adaptation_course-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+
+      - name: Prepare PDF artifact
+        run: |
+          mkdir -p dist
+          cp build/adaptation_course.pdf "dist/${PDF_NAME}"
+
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
-          name: adaptation-course-pdf
-          path: build/adaptation_course.pdf
+          name: adaptation-course-${{ env.BUILD_VERSION }}
+          path: dist/${{ env.PDF_NAME }}
+
+      - name: Prepare Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          mkdir -p public
+          cp build/adaptation_course.pdf public/adaptation_course-latest.pdf
+          cat > public/index.html <<'HTML'
+          <!doctype html>
+          <html lang="ru">
+          <head>
+            <meta charset="utf-8">
+            <title>Адаптационный курс</title>
+          </head>
+          <body>
+            <h1>Адаптационный курс</h1>
+            <p><a href="adaptation_course-latest.pdf">Открыть актуальную версию PDF</a></p>
+          </body>
+          </html>
+          HTML
+
+      - name: Setup Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/deploy-pages@v4
+
+      - name: Attach PDF to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "dist/${PDF_NAME}" --clobber
