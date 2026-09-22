@@ -1,0 +1,189 @@
+\chapter{Краткие ответы}
+Этот раздел предназначен для проверки после самостоятельной попытки. Полный ход решения доступен по ссылке у каждого ответа. Коды в таблицах флагов шестнадцатеричные; порядок флагов --- CF, OF, ZF, SF.
+
+\section{Самостоятельные задания}
+\paragraph*{З1.}\label{ans:z1}
+$214_{10}=11010110_2=326_8=D6_{16}$.
+\hyperref[sol:z1]{Решение.}
+
+\paragraph*{З2.}\label{ans:z2}
+$91_{10}$; $187_{10}$; $125_{10}$.
+\hyperref[sol:z2]{Решение.}
+
+\paragraph*{З3.}\label{ans:z3}
+$32231_4$; $1655_8$; $3AD_{16}$.
+\hyperref[sol:z3]{Решение.}
+
+\paragraph*{З4.}\label{ans:z4}
+$3C7_{16}=1111000111_2=1707_8$. Из предложенных записей допустима только $203_4$.
+\hyperref[sol:z4]{Решение.}
+
+\paragraph*{З5.}\label{ans:z5}
+$110001_2$; $11111_2$.
+\hyperref[sol:z5]{Решение.}
+
+\paragraph*{З6.}\label{ans:z6}
+$344_{16}$; $24A_{16}$.
+\hyperref[sol:z6]{Решение.}
+
+\paragraph*{З7.}\label{ans:z7}
+$250_8$; $110111_2$.
+\hyperref[sol:z7]{Решение.}
+
+\paragraph*{З8.}\label{ans:z8}
+Частное $43_8$, остаток $3_8$; частное $42_{16}$, остаток $3_{16}$.
+\hyperref[sol:z8]{Решение.}
+
+\paragraph*{З9.}\label{ans:z9}
+Во всех форматах 64 комбинации. Unsigned: $[0,63]$, 64 значения; прямой и обратный: $[-31,31]$, по 63 значения; дополнительный: $[-32,31]$, 64 значения.
+\hyperref[sol:z9]{Решение.}
+
+\paragraph*{З10.}\label{ans:z10}
+Unsigned: $[0,511]$, коды границ \texttt{000000000}, \texttt{111111111}. Дополнительный: $[-256,255]$, коды \texttt{100000000}, \texttt{011111111}. В обоих случаях 512 значений.
+\hyperref[sol:z10]{Решение.}
+
+\paragraph*{З11.}\label{ans:z11}
+10; 10; 9 битов соответственно.
+\hyperref[sol:z11]{Решение.}
+
+\paragraph*{З12.}\label{ans:z12}
+Прочерк означает, что число непредставимо.
+\begin{center}
+\begin{tabular}{l|ccc}
+Формат & $-128$ & 127 & 128\\\hline
+Unsigned & --- & \texttt{7F} & \texttt{80}\\
+Прямой & --- & \texttt{7F} & ---\\
+Обратный & --- & \texttt{7F} & ---\\
+Дополнительный & \texttt{80} & \texttt{7F} & ---\\
+Со смещением 128 & \texttt{00} & \texttt{FF} & ---
+\end{tabular}
+\end{center}
+\hyperref[sol:z12]{Решение.}
+
+\paragraph*{З13.}\label{ans:z13}
+Порядок: прямой, обратный, дополнительный, со смещением 128.
+Для $+46$: \texttt{2E}, \texttt{2E}, \texttt{2E}, \texttt{AE}.
+Для $-46$: \texttt{AE}, \texttt{D1}, \texttt{D2}, \texttt{52}.
+Двоичные записи даны в \hyperref[sol:z13]{решении}.
+
+\paragraph*{З14.}\label{ans:z14}
+Unsigned: 214; прямой: $-86$; обратный: $-41$; дополнительный: $-42$; со смещением 128: 86.
+\hyperref[sol:z14]{Решение.}
+
+\paragraph*{З15.}\label{ans:z15}
+Коды операндов: \texttt{58}, \texttt{91}. Сумма $-23$: код со смещением \texttt{69}, дополнительный \texttt{E9}.
+\hyperref[sol:z15]{Решение.}
+
+\paragraph*{З16.}\label{ans:z16}
+$-1$: \texttt{11111111}; 0: \texttt{00000000}; $-128$: \texttt{10000000}. Инверсия плюс один последнего кода снова даёт \texttt{10000000}. Число $+128$ в 8-битном дополнительном коде непредставимо.
+\hyperref[sol:z16]{Решение.}
+
+\paragraph*{З17.}\label{ans:z17}
+Код \texttt{21}, unsigned и signed 33; флаги 1, 0, 0, 0.
+\hyperref[sol:z17]{Решение З17.}
+
+\paragraph*{З18.}\label{ans:z18}
+$95+48$: код \texttt{8F}, unsigned 143, signed $-113$; флаги 0, 1, 0, 1.
+$(-100)+(-40)$: код \texttt{74}, unsigned и signed 116; флаги 1, 1, 0, 0.
+\hyperref[sol:z18]{Решение З18.}
+
+\paragraph*{З19.}\label{ans:z19}
+\texttt{F0 + 10}: код \texttt{00}, обе интерпретации 0; флаги 1, 0, 1, 0.
+\texttt{7F + 01}: код \texttt{80}, unsigned 128, signed $-128$; флаги 0, 1, 0, 1.
+\hyperref[sol:z19]{Решение З19.}
+
+\paragraph*{З20.}\label{ans:z20}
+$35-60$: код \texttt{E7}, unsigned 231, signed $-25$; флаги 1, 0, 0, 1.
+$(-110)-30$: код \texttt{74}, unsigned и signed 116; флаги 0, 1, 0, 0.
+\hyperref[sol:z20]{Решение З20.}
+
+\paragraph*{З21.}\label{ans:z21}
+AND: \texttt{00101000} ($28_{16}$); OR: \texttt{11101101} ($ED_{16}$); XOR: \texttt{11000101} ($C5_{16}$); NOT $x$: \texttt{01010011} ($53_{16}$).
+\hyperref[sol:z21]{Решение.}
+
+\paragraph*{З22.}\label{ans:z22}
+Результаты: \texttt{D3}, \texttt{43}, \texttt{52}; бит 6 установлен (AND даёт \texttt{40}); младшие три бита --- \texttt{03}.
+\hyperref[sol:z22]{Решение.}
+
+\paragraph*{З23.}\label{ans:z23}
+Поле равно 5; после сброса бита 3 код \texttt{D2}; собранный байт \texttt{A5}.
+\hyperref[sol:z23]{Решение.}
+
+\paragraph*{З24.}\label{ans:z24}
+$(B6_{16}\mathbin{\mathrm{AND}}F0_{16})\mathbin{\mathrm{OR}}09_{16}=B9_{16}$. Один OR дал бы \texttt{BF}.
+\hyperref[sol:z24]{Решение.}
+
+\paragraph*{З25.}\label{ans:z25}
+Влево на 1: \texttt{11011010} ($DA_{16}$); влево на 3: \texttt{01101000} ($68_{16}$); вправо на 2: \texttt{00011011} ($1B_{16}$).
+\hyperref[sol:z25]{Решение.}
+
+\paragraph*{З26.}\label{ans:z26}
+Исходное значение $-109$. Арифметические сдвиги: \texttt{11001001} ($C9_{16}$, $-55$) и \texttt{11110010} ($F2_{16}$, $-14$). Логический на 3: \texttt{00010010} ($12_{16}$, 18). Деление в C даёт $-13$.
+\hyperref[sol:z26]{Решение.}
+
+\paragraph*{З27.}\label{ans:z27}
+Циклические: \texttt{00000011} ($03_{16}$) и \texttt{01100000} ($60_{16}$).
+Логический сдвиг даёт $02_{16}$, то есть \texttt{00000010}.
+\hyperref[sol:z27]{Решение.}
+
+\paragraph*{З28.}\label{ans:z28}
+Расширение: \texttt{00D3} (211), \texttt{FFD3} ($-45$). Сужение: \texttt{37} (55 вместо исходного 311).
+\hyperref[sol:z28]{Решение.}
+
+\paragraph*{З29.}\label{ans:z29}
+$-23$; расширение \texttt{FFE9}; сумма \texttt{F1}, знаковое $-15$. Флаги: 0, 0, 0, 1.
+\hyperref[sol:z29]{Решение.}
+
+\paragraph*{З30.}\label{ans:z30}
+Значение зависит от интерпретации; CF и OF независимы; 8-битный NOT $0F_{16}$ равен $F0_{16}$.
+\hyperref[sol:z30]{Решение с контрпримерами.}
+
+\paragraph*{З31.}\label{ans:z31}
+Арифметический сдвиг \texttt{11111101} вправо на 1 даёт \texttt{11111110} ($FE_{16}$), то есть $-2$. Деление $-3/2$ в C даёт $-1$.
+\hyperref[sol:z31]{Решение.}
+
+\paragraph*{З32.}\label{ans:z32}
+Диапазон $[-64,63]$. Коды операндов \texttt{0100111} и \texttt{1100110}. Сумма 13 имеет смещённый код \texttt{1001101}. Простое сложение с усечением даёт \texttt{0001101}, что в смещённом коде означает $-51$. Дополнительный код правильной суммы: \texttt{0001101}.
+\hyperref[sol:z32]{Решение.}
+
+\section{Контрольная по занятиям №1--2}\label{answers:mock}
+\paragraph*{К1.}\label{ans:k1}
+$173_{10}=10101101_2=255_8=AD_{16}$;
+$2E6_{16}=1011100110_2=1346_8$.
+\hyperref[sol:k1]{Решение и баллы.}
+
+\paragraph*{К2.}\label{ans:k2}
+$421_{16}$; частное $31_8$, остаток $5_8$.
+\hyperref[sol:k2]{Решение и баллы.}
+
+\paragraph*{К3.}\label{ans:k3}
+$[-512,511]$, 1024 значения; 11 битов; 11 битов.
+\hyperref[sol:k3]{Решение и баллы.}
+
+\paragraph*{К4.}\label{ans:k4}
+Прямой \texttt{B5}, обратный \texttt{CA}, дополнительный \texttt{CB}, смещённый \texttt{4B}. Для \texttt{D9}: unsigned 217, signed $-39$; знаковое расширение \texttt{FFD9}.
+\hyperref[sol:k4]{Решение и баллы.}
+
+\paragraph*{К5.}\label{ans:k5}
+\begin{center}
+\begin{tabular}{l|c|r|cccc}
+Операция & Код & Signed & CF & OF & ZF & SF\\\hline
+$63+65$ & \texttt{80} & $-128$ & 0 & 1 & 0 & 1\\
+$(-90)+(-50)$ & \texttt{74} & 116 & 1 & 1 & 0 & 0\\
+$25-70$ & \texttt{D3} & $-45$ & 1 & 0 & 0 & 1\\
+$(-100)-40$ & \texttt{74} & 116 & 0 & 1 & 0 & 0
+\end{tabular}
+\end{center}
+\hyperref[sol:k5]{Решение и баллы.}
+
+\paragraph*{К6.}\label{ans:k6}
+AND \texttt{40}, OR \texttt{FF}, XOR \texttt{BF}, NOT $x$ \texttt{35}; замена тетрады даёт \texttt{C3}.
+\hyperref[sol:k6]{Решение и баллы.}
+
+\paragraph*{К7.}\label{ans:k7}
+Логический вправо: \texttt{2A} (42); арифметический вправо: \texttt{EA} ($-22$); циклический влево: \texttt{53}; расширение: \texttt{FFA9}; исходное число $-87$, деление на 4 с округлением к нулю даёт $-21$.
+\hyperref[sol:k7]{Решение и баллы.}
+
+\paragraph*{К8.}\label{ans:k8}
+Сохранённый код \texttt{00}, знаковая сумма $-3+3=0$. CF=1, OF=0, ZF=1, SF=0.
+\hyperref[sol:k8]{Решение и баллы.}
