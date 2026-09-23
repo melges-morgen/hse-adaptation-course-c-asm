@@ -72,6 +72,19 @@ The Docker build uses `latexmk` and a TeX environment with Russian language supp
 
 Generated artifacts such as PDFs, `.aux`, `.log`, `.toc`, `.out`, `.fls`, `.fdb_latexmk`, and temporary build directories should not be committed unless the user explicitly asks to publish generated PDFs.
 
+## Lecture Presentations
+
+For every lecture, prepare a presentation in both formats: Reveal.js HTML and PDF.
+
+- Treat the Reveal.js version as the editable source of the lecture slides.
+- Export the PDF from the same Reveal.js source so the content, order, and visual style stay synchronized.
+- Keep lecture presentations in the shared course style: 16:9 layout, dark blue background, light text, turquoise accents, Carlito for prose, and a monospace font for code, bit patterns, commands, and machine representations.
+- Reuse the common assets and theme under `slides/theme/` (`course.css`, `course.js`, title/content frames) instead of duplicating presentation-specific styling.
+- Preserve readability for first-year students: large text, concise slide content, concrete examples, and speaker notes for detailed explanations.
+- Ensure the static PDF remains useful on its own: important content must be visible without relying only on Reveal.js interactions or hidden fragments.
+- Keep tables, formulas, code blocks, bit layouts, callouts, slide footers, and optional/supplementary slides visually consistent with the shared theme.
+- When changing lecture slides, rebuild and verify both the Reveal.js HTML and the PDF through the Docker-based slide build.
+
 ## Verification
 
 Verify LaTeX changes by building in Docker with `make pdf`.

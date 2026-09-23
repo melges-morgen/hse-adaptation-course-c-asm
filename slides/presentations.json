@@ -1,0 +1,13 @@
+{
+  "lecture02": {
+    "slides": 62,
+    "mainSlides": 52,
+    "pdf": "lecture02-slides.pdf"
+  },
+  "lecture02-original": {
+    "slides": 60,
+    "mainSlides": 51,
+    "pdf": "lecture02-original.pdf",
+    "sourceSequence": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "adaptation-course-slides",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "reveal.js": "5.2.1",
+    "playwright": "1.58.2",
+    "pdf-lib": "1.17.1"
+  }
+}

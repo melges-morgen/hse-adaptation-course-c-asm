@@ -8,3 +8,4 @@ dist/
 *.fdb_latexmk
 *.synctex.gz
 *.pdf
+node_modules/

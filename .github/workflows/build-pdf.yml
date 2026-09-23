@@ -25,8 +25,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build PDF
-        run: make pdf
+      - name: Verify numerical examples
+        run: python3 scripts/check-lecture02.py
+
+      - name: Build course and lecture slides
+        run: make lecture2 lecture2-original
 
       - name: Prepare build metadata
         env:
@@ -56,23 +59,32 @@ jobs:
           echo "BUILD_DATETIME=$BUILD_DATETIME" >> "$GITHUB_ENV"
           echo "BUILD_VERSION=$BUILD_VERSION" >> "$GITHUB_ENV"
           echo "PDF_NAME=adaptation_course-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+          echo "SLIDES_PDF_NAME=lecture02-slides-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+          echo "ORIGINAL_PDF_NAME=lecture02-original-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+          echo "SLIDES_ZIP_NAME=lecture02-presentations-${BUILD_VERSION}.zip" >> "$GITHUB_ENV"
 
       - name: Prepare PDF artifact
         run: |
           mkdir -p dist
           cp build/adaptation_course.pdf "dist/${PDF_NAME}"
+          cp build/lecture02-slides.pdf "dist/${SLIDES_PDF_NAME}"
+          cp build/lecture02-original.pdf "dist/${ORIGINAL_PDF_NAME}"
+          python3 -c 'import os, shutil; shutil.make_archive("dist/" + os.environ["SLIDES_ZIP_NAME"][:-4], "zip", "build/slides")'
 
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
           name: adaptation-course-${{ env.BUILD_VERSION }}
-          path: dist/${{ env.PDF_NAME }}
+          path: dist/
 
       - name: Prepare Pages artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           mkdir -p public
           cp build/adaptation_course.pdf public/adaptation_course-latest.pdf
+          cp build/lecture02-slides.pdf public/lecture02-slides.pdf
+          cp build/lecture02-original.pdf public/lecture02-original.pdf
+          cp -R build/slides public/slides
           cat > public/index.html <<'HTML'
           <!doctype html>
           <html lang="ru">
@@ -83,6 +95,18 @@ jobs:
           <body>
             <h1>Адаптационный курс</h1>
             <p><a href="adaptation_course-latest.pdf">Открыть актуальную версию PDF</a></p>
+            <h2>Лекция №2. Кодирование данных и команд</h2>
+            <p>Лекция и семинар — по 90 минут. Условия и решения семинара находятся в пособии.</p>
+            <h3>Сценарий занятия на 90 минут</h3>
+            <ul>
+              <li><a href="slides/lecture02/">Презентация Reveal.js</a></li>
+              <li><a href="lecture02-slides.pdf">Презентация в PDF</a></li>
+            </ul>
+            <h3>По структуре исходного PPTX — 60 слайдов</h3>
+            <ul>
+              <li><a href="slides/lecture02-original/">Reveal.js: lecture02-original</a></li>
+              <li><a href="lecture02-original.pdf">PDF: lecture02-original</a></li>
+            </ul>
           </body>
           </html>
           HTML
@@ -107,4 +131,4 @@ jobs:
         if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" "dist/${PDF_NAME}" --clobber
+        run: gh release upload "${{ github.event.release.tag_name }}" "dist/${PDF_NAME}" "dist/${SLIDES_PDF_NAME}" "dist/${ORIGINAL_PDF_NAME}" "dist/${SLIDES_ZIP_NAME}" --clobber
