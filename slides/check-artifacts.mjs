@@ -9,7 +9,9 @@ const presentations = JSON.parse(await readFile('slides/presentations.json', 'ut
 if (!Object.hasOwn(presentations, id)) throw new Error(`Unknown presentation: ${id}`);
 const expected = presentations[id];
 const html = await readFile(`${root}/slides/${id}/index.html`, 'utf8').catch(() => '');
-if (!html.includes('Кодирование')) throw new Error(`Missing built lecture HTML: ${id}`);
+if (!/<!doctype html>/i.test(html) || !/<title>[^<]+<\/title>/.test(html)) {
+  throw new Error(`Missing built lecture HTML: ${id}`);
+}
 const slides = (html.match(/<section\b/g) || []).length;
 if (slides !== expected.slides) throw new Error(`Expected ${expected.slides} slides, got ${slides}`);
 if (expected.sourceSequence) {

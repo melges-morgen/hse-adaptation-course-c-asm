@@ -5,7 +5,7 @@ PRACTICE := test1_practice.tex
 BUILD_DIR := build
 SLIDES_IMAGE := adaptation-course-slides
 
-.PHONY: pdf pud-pdf practice-pdf clean docker-image slides-image lecture2-slides lecture2-original lecture2
+.PHONY: pdf pud-pdf practice-pdf clean docker-image slides-image lecture2-slides lecture2-original lecture2 lecture3-slides lecture3
 
 docker-image:
 	docker build -t $(IMAGE) .
@@ -47,6 +47,14 @@ lecture2-original: slides-image
 		$(SLIDES_IMAGE) $(BUILD_DIR) lecture02-original
 	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
 		--entrypoint node $(SLIDES_IMAGE) slides/check-artifacts.mjs $(BUILD_DIR) lecture02-original
+
+lecture3-slides: slides-image
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
+		$(SLIDES_IMAGE) $(BUILD_DIR) lecture03
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
+		--entrypoint node $(SLIDES_IMAGE) slides/check-artifacts.mjs $(BUILD_DIR) lecture03
+
+lecture3: pdf lecture3-slides
 
 clean:
 	rm -rf $(BUILD_DIR)
