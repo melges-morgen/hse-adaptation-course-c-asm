@@ -70,13 +70,16 @@ try {
       Reveal.slide(index);
       const rect = slide.getBoundingClientRect();
       const scale = rect.width / 1280;
-      for (const el of slide.querySelectorAll('h1,h2,h3,p,li,pre,table,.bits,svg,.panel')) {
+      for (const el of slide.querySelectorAll('h1,h2,h3,p,li,pre,table,.bits,svg,.panel,img.diagram')) {
         if (el.closest('.notes')) continue;
         const r = el.getBoundingClientRect();
         if (r.bottom > rect.top + 648 * scale || r.right > rect.right - 50 * scale || r.left < rect.left) {
           issues.push({ slide: index + 1, text: el.textContent.trim().slice(0, 70), issue: 'content outside safe area' });
         }
         if (el.scrollWidth > el.clientWidth + 2) issues.push({ slide: index + 1, issue: 'horizontal overflow', text: el.textContent.trim().slice(0, 70) });
+      }
+      for (const img of slide.querySelectorAll('img')) {
+        if (!img.complete || !img.naturalWidth) issues.push({ slide: index + 1, issue: 'image not loaded', src: img.getAttribute('src') });
       }
       if (!slide.querySelector('aside.notes')) issues.push({ slide: index + 1, issue: 'missing speaker notes' });
     }

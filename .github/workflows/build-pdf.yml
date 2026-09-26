@@ -29,7 +29,7 @@ jobs:
         run: python3 scripts/check-lecture02.py
 
       - name: Build course and lecture slides
-        run: make lecture2 lecture2-original
+        run: make lecture2 lecture2-original lecture4 lecture4-journal
 
       - name: Prepare build metadata
         env:
@@ -61,7 +61,9 @@ jobs:
           echo "PDF_NAME=adaptation_course-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "SLIDES_PDF_NAME=lecture02-slides-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "ORIGINAL_PDF_NAME=lecture02-original-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
-          echo "SLIDES_ZIP_NAME=lecture02-presentations-${BUILD_VERSION}.zip" >> "$GITHUB_ENV"
+          echo "LECTURE4_PDF_NAME=lecture04-slides-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+          echo "JOURNAL_PDF_NAME=lecture04-journal-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+          echo "SLIDES_ZIP_NAME=course-presentations-${BUILD_VERSION}.zip" >> "$GITHUB_ENV"
 
       - name: Prepare PDF artifact
         run: |
@@ -69,6 +71,8 @@ jobs:
           cp build/adaptation_course.pdf "dist/${PDF_NAME}"
           cp build/lecture02-slides.pdf "dist/${SLIDES_PDF_NAME}"
           cp build/lecture02-original.pdf "dist/${ORIGINAL_PDF_NAME}"
+          cp build/lecture04-slides.pdf "dist/${LECTURE4_PDF_NAME}"
+          cp build/lecture04-journal.pdf "dist/${JOURNAL_PDF_NAME}"
           python3 -c 'import os, shutil; shutil.make_archive("dist/" + os.environ["SLIDES_ZIP_NAME"][:-4], "zip", "build/slides")'
 
       - name: Upload PDF artifact
@@ -84,6 +88,8 @@ jobs:
           cp build/adaptation_course.pdf public/adaptation_course-latest.pdf
           cp build/lecture02-slides.pdf public/lecture02-slides.pdf
           cp build/lecture02-original.pdf public/lecture02-original.pdf
+          cp build/lecture04-slides.pdf public/lecture04-slides.pdf
+          cp build/lecture04-journal.pdf public/lecture04-journal.pdf
           cp -R build/slides public/slides
           cat > public/index.html <<'HTML'
           <!doctype html>
@@ -102,10 +108,21 @@ jobs:
               <li><a href="slides/lecture02/">Презентация Reveal.js</a></li>
               <li><a href="lecture02-slides.pdf">Презентация в PDF</a></li>
             </ul>
-            <h3>По структуре исходного PPTX — 60 слайдов</h3>
+            <h3>Альтернативная презентация уже прочитанной лекции — 60 слайдов</h3>
             <ul>
               <li><a href="slides/lecture02-original/">Reveal.js: lecture02-original</a></li>
               <li><a href="lecture02-original.pdf">PDF: lecture02-original</a></li>
+            </ul>
+            <h2>Лекция №4. Как устроен компьютер и где исполняется программа</h2>
+            <p>90 минут: компоненты, шины, память и кэш, прерывания, путь инструкций и данных.</p>
+            <ul>
+              <li><a href="slides/lecture04/">Презентация Reveal.js</a></li>
+              <li><a href="lecture04-slides.pdf">Презентация в PDF</a></li>
+            </ul>
+            <h3>Сквозной пример: разработка журнала оценок группы</h3>
+            <ul>
+              <li><a href="slides/lecture04-journal/">Презентация Reveal.js</a></li>
+              <li><a href="lecture04-journal.pdf">Презентация в PDF</a></li>
             </ul>
           </body>
           </html>
@@ -131,4 +148,4 @@ jobs:
         if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" "dist/${PDF_NAME}" "dist/${SLIDES_PDF_NAME}" "dist/${ORIGINAL_PDF_NAME}" "dist/${SLIDES_ZIP_NAME}" --clobber
+        run: gh release upload "${{ github.event.release.tag_name }}" "dist/${PDF_NAME}" "dist/${SLIDES_PDF_NAME}" "dist/${ORIGINAL_PDF_NAME}" "dist/${LECTURE4_PDF_NAME}" "dist/${JOURNAL_PDF_NAME}" "dist/${SLIDES_ZIP_NAME}" --clobber

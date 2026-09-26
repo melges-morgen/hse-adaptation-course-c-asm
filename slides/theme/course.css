@@ -26,6 +26,7 @@ html, body, body.reveal-viewport { background: var(--bg); }
 .reveal code, .reveal pre { font-family: CourseMono, monospace; }
 .reveal code { font-size: .83em; color: #e1eeff; white-space: nowrap; }
 .reveal pre { box-sizing: border-box; width: 100%; font-size: 27px; line-height: 1.55; margin: 20px 0; padding: 22px 26px; background: #111324; border-left: 4px solid var(--accent); box-shadow: none; white-space: pre-wrap; }
+.reveal pre.code-compact { font-size: 21px; line-height: 1.38; }
 .reveal .cols { display: grid; grid-template-columns: 1.35fr 1fr; gap: 40px; align-items: start; }
 .reveal .equal { grid-template-columns: 1fr 1fr; }
 .reveal .panel { background: var(--panel); padding: 26px 30px; border-top: 3px solid var(--accent); }
@@ -49,6 +50,7 @@ html, body, body.reveal-viewport { background: var(--bg); }
 .reveal .bits .exponent { border-color: var(--blue); color: var(--blue); }
 .reveal .bits small { display: block; font: 22px Carlito, sans-serif; color: var(--muted); margin-top: 12px; }
 .reveal svg { width: 100%; height: auto; max-height: 310px; }
+.reveal .diagram { display: block; width: 100%; height: 310px; object-fit: contain; margin: 12px 0 24px; }
 .reveal .swatches { display: flex; gap: 8px; margin: 20px 0; }
 .reveal .swatches span { height: 56px; flex: 1; border: 1px solid #a5aebc; }
 .reveal .slide-footer { position: absolute; bottom: 22px; left: 82px; right: 82px; display: flex; justify-content: space-between; padding-top: 12px; color: #44546a; font-size: 17px; }

@@ -10,18 +10,50 @@ The materials are written in Russian. Keep the language of course content Russia
 
 ## Repository Structure
 
-- `Программа курса.md` contains the high-level course outline.
-- `adaptation_course.tex` is the main LaTeX entry point for the full course document.
+- `pud_adaptation_course.tex` is the authoritative programme for section 2,
+  including lectures and seminars 4--8 and their learning outcomes.
+- `adaptation_course.tex` is the main LaTeX entry point for the full course
+  handbook; `tex/` contains its canonical content.
 - `tex/preamble.tex` contains shared packages, page geometry, spacing, and LaTeX settings.
 - `tex/frontmatter.tex` contains the title page, annotation, usage notes, and table of contents.
 - `tex/chapters/chapter1_math_foundations.tex` contains the first chapter content.
-- `tex/chapters/chapter2_arch_os_tools.tex` contains the second chapter outline and draft structure.
+- `tex/chapters/chapter2_arch_os_tools.tex` includes the prepared lecture 4
+  from `tex/lectures/lecture04_*.tex` and the outlines for subsequent sessions.
 - `tex/backmatter/references.tex` contains the bibliography / used literature section.
 - `tex/appendices/appendices.tex` contains appendices and compact reference material.
-- `drafts/adaptation_course_combined_draft.tex` is a shorter combined draft. Do not treat it as canonical unless the user explicitly says so.
+- `slides/lecture02-original/index.html` is an active alternative presentation
+  for lecture 2. It preserves the structure of the lecture that was already
+  delivered and is built and published alongside the main presentation.
+- `examples/` contains external methodological examples and is not a source of
+  course requirements.
+- `demos/lecture04/` contains executable C/NASM examples for lecture 4;
+  `make lecture4-check` verifies them in a Linux x86-64 Docker container.
+- `slides/lecture04-journal/` presents computer architecture through a
+  bare-metal gradebook running in QEMU. Its companion
+  `demos/lecture04-journal/` contains six 16-bit NASM/BIOS/QEMU checkpoints;
+  C in this presentation explains algorithms only.
+  `tex/lectures/lecture04_journal.tex` is a supplementary handbook section.
+- `legacy/` contains historical or superseded materials. It is for explicit
+  historical comparison only and must not be used as an active source.
 - `Dockerfile` defines the Docker image used for LaTeX builds.
 - `Makefile` provides the local Docker-based build target.
 - `.github/workflows/build-pdf.yml` builds the PDF in GitHub Actions, uploads versioned artifacts, publishes the latest master PDF to GitHub Pages, and attaches release PDFs to GitHub Releases.
+
+### Source of truth
+
+When sources disagree, use this order:
+
+1. `pud_adaptation_course.tex` for the programme and outcomes of section 2.
+2. The canonical files under `tex/` and the main entry point
+   `adaptation_course.tex` for the handbook text.
+3. `slides/lectureNN/index.html` for editable lecture presentations.
+4. `slides/theme/`, `slides/presentations.json`, and `Makefile` for the
+   presentation system and build contract.
+5. `docs/superpowers/` for historical design decisions and implementation
+   plans, not for current course requirements.
+
+Do not use files under `legacy/` to decide current content. If a legacy file is
+needed for historical comparison, state that explicitly in the change or plan.
 
 ## Content Guidelines
 
@@ -66,7 +98,9 @@ Builds must run inside Docker containers, including local builds, so contributor
 
 Use `make pdf` to build the full document locally through Docker.
 
-The intended full-document build target is `adaptation_course.tex`. Draft files under `drafts/` are not build targets.
+The intended full-document build target is `adaptation_course.tex`. The PUD and
+practice handbook have separate targets, `pud-pdf` and `practice-pdf`.
+Nothing under `legacy/` is a build target.
 
 The Docker build uses `latexmk` and a TeX environment with Russian language support.
 

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 310" role="img" aria-labelledby="title desc">
+ <title id="title">Временная диаграмма прерывания</title><desc id="desc">CPU исполняет программу, принимает событие устройства, сохраняет состояние, выполняет обработчик и возвращается. Между запросом и принятием может быть ожидание.</desc>
+ <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0 0L7 3L0 6" fill="none" stroke="#8bbcff" stroke-width="1.5"/></marker></defs>
+ <g stroke="#8bbcff" fill="none" stroke-width="3" marker-end="url(#a)"><path d="M10 285H1065"/><path d="M260 65H350V133"/></g>
+ <g fill="#25283f" stroke="#00d4aa" stroke-width="2"><rect x="10" y="140" width="235" height="90" rx="8"/><rect x="260" y="140" width="180" height="90" rx="8"/><rect x="455" y="140" width="250" height="90" rx="8"/><rect x="720" y="140" width="160" height="90" rx="8"/><rect x="895" y="140" width="175" height="90" rx="8"/></g>
+ <g fill="#f0f4f8" text-anchor="middle" font-family="Carlito, sans-serif" font-size="26"><text x="127" y="179">Программа</text><text x="127" y="210">работает</text><text x="350" y="179">Сохранить</text><text x="350" y="210">состояние</text><text x="580" y="179">Обработчик ОС</text><text x="580" y="210">обслужить событие</text><text x="800" y="179">Возврат</text><text x="800" y="210">состояния</text><text x="982" y="179">Продолжить</text><text x="982" y="210">выполнение</text></g>
+ <g fill="#8bbcff" font-family="Carlito, sans-serif" font-size="25"><text x="10" y="55">Событие устройства</text><text x="470" y="70">Запрос может ожидать принятия</text><text x="840" y="279">Время →</text></g>
+ <text x="540" y="258" text-anchor="middle" fill="#b9c5d4" font-family="Carlito, sans-serif" font-size="23">CPU сохраняет часть состояния; обработчик — дополнительные регистры</text>
+</svg>

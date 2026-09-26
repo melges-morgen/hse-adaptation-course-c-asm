@@ -4,6 +4,16 @@
     "mainSlides": 52,
     "pdf": "lecture02-slides.pdf"
   },
+  "lecture04": {
+    "slides": 63,
+    "mainSlides": 55,
+    "pdf": "lecture04-slides.pdf"
+  },
+  "lecture04-journal": {
+    "slides": 61,
+    "mainSlides": 55,
+    "pdf": "lecture04-journal.pdf"
+  },
   "lecture03": {
     "slides": 46,
     "mainSlides": 38,

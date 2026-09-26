@@ -7,7 +7,7 @@ sections.forEach((section, index) => {
   footer.className = 'slide-footer';
   const label = document.createElement('span');
   label.textContent = section.classList.contains('supplement')
-    ? 'Дополнительно · арифметика и точность'
+    ? `Дополнительно · ${document.body.dataset.supplementLabel || 'арифметика и точность'}`
     : `${lectureLabel} · ${section.dataset.block || 'Кодирование данных и команд'}`;
   const number = document.createElement('span');
   number.textContent = `${String(index + 1).padStart(2, '0')} / ${sections.length}`;
