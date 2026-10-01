@@ -10,6 +10,13 @@ RUN apt-get update \
         texlive-latex-extra \
         texlive-fonts-recommended \
         texlive-lang-cyrillic \
+        texlive-xetex \
+        pandoc \
+        python3 \
+        poppler-utils \
+        lmodern \
+        fonts-crosextra-carlito \
+        fonts-dejavu-core \
         cm-super \
     && rm -rf /var/lib/apt/lists/*
 

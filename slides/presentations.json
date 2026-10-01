@@ -10,8 +10,10 @@
     "pdf": "lecture04-slides.pdf"
   },
   "lecture04-journal": {
-    "slides": 61,
-    "mainSlides": 55,
+    "slides": 84,
+    "mainSlides": 76,
+    "lesson": "lecture04",
+    "variant": "journal",
     "pdf": "lecture04-journal.pdf"
   },
   "lecture03": {
@@ -22,6 +24,8 @@
   "lecture02-original": {
     "slides": 60,
     "mainSlides": 51,
+    "lesson": "lecture02",
+    "variant": "original",
     "pdf": "lecture02-original.pdf",
     "sourceSequence": true
   }

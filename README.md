@@ -41,6 +41,14 @@ slides/
   theme/                                # общая тема презентаций
 demos/lecture04/                        # проверяемые C/NASM-примеры в Docker
 demos/lecture04-journal/                # шесть 16-битных NASM-версий в QEMU
+demos/seminar04/                         # исходник методички и файлы семинара №4
+demos/seminar04/factorial/               # базовый вариант: C, GCC, GDB
+tex/seminars/seminar04.tex               # подключение методички к общему пособию
+supplementary/ubuntu-terminal/README.md  # дополнительная методичка по Ubuntu и терминалу
+supplementary/debian-install/README.md    # дополнительная лабораторная по Debian и терминалу
+tex/supplementary/materials.tex          # общая часть дополнительных материалов
+tex/supplementary/ubuntu_terminal.tex    # подключение методички по Ubuntu
+supplementary/lab-report/                # демонстрационная работа и заполненный отчёт
 examples/                               # внешние методические образцы
 legacy/                                 # архив исторических материалов
   README.md                             # описание архива и замен
@@ -72,7 +80,7 @@ make pdf
 Результат появится в каталоге:
 
 ```text
-build/adaptation_course.pdf
+build/pdf/adaptation_course.pdf
 ```
 
 ### Практикум к первой контрольной
@@ -102,7 +110,7 @@ build/adaptation_course.pdf
 make practice-pdf
 ```
 
-Результат: `build/test1_practice.pdf`.
+Результат: `build/pdf/test1_practice.pdf`.
 
 Для удаления артефактов сборки:
 
@@ -127,9 +135,9 @@ make lecture2-slides   # только HTML и PDF слайдов
 
 | Артефакт | Путь |
 |---|---|
-| Основное пособие с лекцией и семинаром | `build/adaptation_course.pdf` |
-| Reveal.js-презентация | `build/slides/lecture02/index.html` |
-| PDF презентации | `build/lecture02-slides.pdf` |
+| Основное пособие с лекцией и семинаром | `build/pdf/adaptation_course.pdf` |
+| Reveal.js-презентация | `build/html/lecture02/index.html` |
+| PDF презентации | `build/pdf/lecture02/lecture02-slides.pdf` |
 | Отчёт проверки вёрстки слайдов | `build/lecture02-check.json` |
 
 Презентация содержит **52 основных слайда (включая источники) и 10 дополнительных**.
@@ -149,13 +157,28 @@ Reveal.js 5.2.1, Playwright 1.58.2 и зависимости закреплен�
 версии пакетов шрифтов закреплены в `slides/Dockerfile`. Устанавливать Node.js,
 браузер или шрифты на хост для сборки не нужно. Первая сборка требует интернета
 для Docker и зависимостей; готовая презентация использует только локальные ресурсы.
-Для передачи HTML копируйте **весь каталог `build/slides/`**, включая `vendor/`.
+Для передачи HTML копируйте **весь каталог `build/html/`**, включая `theme/`,
+`vendor/` и подпапки `materials/` занятий. PDF находятся отдельно в `build/pdf/`.
+У лекции №4 и семинара №4 рядом с PDF в папке занятия лежит копия
+студенческих `materials/` с теми же файлами, что и в HTML-публикации.
+Материалы преподавателя и готовые решения в публикацию не включаются.
+
+### Комплекты для студентов
+
+Папки `materials/` формируются как самостоятельные комплекты для выдачи архивом,
+а не как копии дерева исходников `demos/` или `tex/`. Кладите только нужные
+студенту файлы под короткими понятными именами; при совпадении имён разных
+версий добавляйте говорящий суффикс, например `journal-stage3.asm`. В корне
+каждого комплекта нужен `README.md` с назначением файлов и командами,
+работающими после распаковки без исходного репозитория. Не включайте
+преподавательские решения, внутренние скрипты проверки и временные файлы.
+Проверяйте точный состав архива и практические команды на распакованной копии.
 
 Обычный просмотр возможен открытием HTML-файла. Для режима преподавателя
 используйте HTTP-сервер; например, при наличии Python:
 
 ```bash
-python3 -m http.server 8000 --bind 127.0.0.1 --directory build/slides
+python3 -m http.server 8000 --bind 127.0.0.1 --directory build/html
 ```
 
 Адрес: `http://127.0.0.1:8000/lecture02/`. Стрелки и пробел переключают слайды,
@@ -186,15 +209,15 @@ make lecture2-original
 | Артефакт | Путь |
 |---|---|
 | Исходник | `slides/lecture02-original/index.html` |
-| Reveal.js | `build/slides/lecture02-original/index.html` |
-| PDF (60 страниц) | `build/lecture02-original.pdf` |
+| Reveal.js | `build/html/lecture02/original/index.html` |
+| PDF (60 страниц) | `build/pdf/lecture02/lecture02-original.pdf` |
 | Отчёт проверки | `build/lecture02-original-check.json` |
 
 Атрибут `data-source-slide` у каждого слайда связывает его с номером слайда PPTX.
 Сборка проверяет непрерывную последовательность 1…60. Это вариант по структуре
 PPTX; основной `lecture02` остаётся отдельным сценарием на 90 минут.
 После запуска HTTP-сервера из инструкции выше адрес нового варианта:
-`http://127.0.0.1:8000/lecture02-original/`.
+`http://127.0.0.1:8000/lecture02/original/`.
 
 Оба варианта используют один экспортёр. Реестр `slides/presentations.json`
 задаёт ожидаемое число слайдов, число основных слайдов и имя PDF.
@@ -226,16 +249,16 @@ python3 scripts/check-lecture03.py  # числовые примеры, стан�
 
 | Артефакт | Путь |
 |---|---|
-| Текст лекции в общем пособии | `build/adaptation_course.pdf` |
-| Reveal.js | `build/slides/lecture03/index.html` |
-| PDF презентации (46 страниц) | `build/lecture03-slides.pdf` |
+| Текст лекции в общем пособии | `build/pdf/adaptation_course.pdf` |
+| Reveal.js | `build/html/lecture03/index.html` |
+| PDF презентации (46 страниц) | `build/pdf/lecture03/lecture03-slides.pdf` |
 | Отчёт проверки слайдов | `build/lecture03-check.json` |
 
 Исходники: `tex/lectures/lecture03_intro.tex`,
 `tex/lectures/lecture03_arithmetic.tex`, `slides/lecture03/index.html`.
 Текст подключён в разделе лекции №3 главы 1. Семинар №3 — отдельный
 существующий материал. Общая тема и правила передачи автономного HTML
-совпадают с лекцией №2: копируйте весь `build/slides/`, включая ресурсы.
+совпадают с лекцией №2: копируйте весь `build/html/`, включая ресурсы.
 После запуска HTTP-сервера адрес: `http://127.0.0.1:8000/lecture03/`.
 
 ### Лекция №4: как устроен компьютер и где исполняется программа
@@ -265,9 +288,11 @@ make lecture4-check    # расчёты Python + сборка/запуск C и 
 
 | Артефакт | Путь |
 |---|---|
-| Текст лекции в пособии | `build/adaptation_course.pdf` |
-| Reveal.js | `build/slides/lecture04/index.html` |
-| PDF (63 страницы) | `build/lecture04-slides.pdf` |
+| Текст лекции в пособии | `build/pdf/adaptation_course.pdf` |
+| Reveal.js | `build/html/lecture04/index.html` |
+| PDF (63 страницы) | `build/pdf/lecture04/lecture04-slides.pdf` |
+| Студенческие дополнения | `build/html/lecture04/materials/README.md` |
+| Те же дополнения рядом с PDF | `build/pdf/lecture04/materials/` |
 | Проверка вёрстки | `build/lecture04-check.json` |
 
 Исходники текста: `tex/lectures/lecture04_intro.tex` и
@@ -275,14 +300,14 @@ make lecture4-check    # расчёты Python + сборка/запуск C и 
 `slides/lecture04/index.html`; схемы: `slides/lecture04/assets/`.
 Демонстрация: `demos/lecture04/`. Семинар №4 остаётся отдельным материалом.
 Для просмотра через HTTP используйте `/lecture04/` после запуска сервера
-из инструкции выше. Для передачи копируйте весь `build/slides/`.
+из инструкции выше. Для передачи копируйте весь `build/html/`.
 
 ### Лекция №4: архитектура и организация компьютера
 
 Сквозной пример — разработка журнала оценок группы на работающей программе:
 запуск → вывод одной оценки → таблица из 16 студентов и четырёх работ → ввод
 через BIOS-клавиатуру и IRQ1 → средние → сохранение и загрузка. Комплект
-содержит **55 основных и 6 дополнительных слайдов**: аппаратное ограничение
+содержит **76 основных и 8 дополнительных слайдов**: аппаратное ограничение
 сменяется NASM-фрагментом и результатом в QEMU. C присутствует как пояснение
 алгоритма, но не исполняется на учебной машине.
 
@@ -293,6 +318,10 @@ make lecture4-check    # расчёты Python + сборка/запуск C и 
 RAW-образом. В слайдах отдельно объясняются DMA, USB, современный GPU и NVMe,
 но они не выдаются за исполняемый код демо. Аппаратный контракт и клавиши
 описаны в `demos/lecture04-journal/README.md`.
+Шесть самостоятельных NASM-исходников лежат в
+`demos/lecture04-journal/stages/stage1/` … `stage6/`; соседние версии удобно
+сравнивать через `diff -u`. Команда `STAGE=N` выбирает исходник и пересобирает
+его перед интерактивным запуском.
 
 ```bash
 make lecture4-journal       # текст пособия, QEMU-проверки, HTML и PDF
@@ -308,13 +337,130 @@ make lecture4-journal-run STAGE=3 # ввод через BIOS INT 16h
 
 | Артефакт | Путь |
 |---|---|
-| Текст лекции в пособии | `build/adaptation_course.pdf` |
-| Reveal.js | `build/slides/lecture04-journal/index.html` |
-| PDF (61 страница) | `build/lecture04-journal.pdf` |
+| Текст лекции в пособии | `build/pdf/adaptation_course.pdf` |
+| Reveal.js | `build/html/lecture04/journal/index.html` |
+| PDF (84 страницы) | `build/pdf/lecture04/lecture04-journal.pdf` |
 | Отчёт вёрстки | `build/lecture04-journal-check.json` |
 
 Исходники: `tex/lectures/lecture04_journal.tex`,
 `slides/lecture04-journal/index.html` и `demos/lecture04-journal/`.
+
+## Семинар №4: практическое продолжение лекции
+
+Студент выполняет и защищает **один из двух вариантов**: базовый на C
+или усложнённый на NASM/BIOS. Оба включены в общее пособие и доступны
+отдельными HTML и A4 PDF.
+
+**Вариант 1 (базовый):** [методичка по факториалу](demos/seminar04/factorial/README.md).
+Студент создаёт каталог и исходник через nano и Vim, собирает программу с
+предупреждениями и `-g -O0`, проверяет случаи 0–20, исследует ошибки в GDB
+и перенаправляет `stdin`, `stdout`, `stderr`. Исходник для автоматической
+проверки остаётся внутренним, в студенческий архив входит только `README.md`
+и `input.txt`. Выпуски:
+`build/html/seminar04/factorial/index.html`,
+`build/pdf/seminar04/seminar04-factorial.pdf`, материалы — в соседней
+папке `factorial/materials/` соответствующего формата.
+
+**Вариант 2 (усложнённый):** [методичка по журналу](demos/seminar04/README.md).
+Рекомендуется Debian Linux актуальной версии на компьютере или в виртуальной
+машине. Подойдёт и другой дистрибутив Linux, если доступны QEMU с графическим
+окном, NASM, GCC, GDB, binutils, `file` и базовые файловые утилиты.
+Команды установки в методичке приведены для Debian; при выборе другого
+дистрибутива студент самостоятельно разбирается с его пакетами и настройкой:
+преподаватели не могут изучить особенности каждого дистрибутива. Для опыта
+с C/GDB нужна среда Linux x86-64. Если среда ещё не готова, семинар №4 можно
+посвятить её установке; невыполненные в аудитории задания завершаются дома.
+Студенты собирают односекторную BIOS-программу, затем полный журнал. В нём они
+самостоятельно рассчитывают цвет и позицию VGA, скан-коды, среднее
+и новый номер сектора сохранения. Дома разбирают память в C/GDB,
+сопоставляют исполняемый ELF-файл с процессом Linux и проверяют
+вычисления и дисковый образ. Студенты выполняют команды
+сборки и проверяют результат сами. Из каждой методички в Docker собираются
+HTML, отдельный A4 PDF и текст выбранного варианта в общем пособии.
+`tex/seminars/seminar04.tex` подключает оба сгенерированных фрагмента;
+для сборки общего пособия используйте `make pdf`.
+
+После распаковки студенческого архива из его папки:
+
+```sh
+mkdir -p work
+cp -n hello.asm work/hello.asm
+cd work
+nasm -f bin hello.asm -o hello.bin
+```
+
+Полные команды создания образов, запуска QEMU и объяснение их флагов
+есть в инструкции варианта 2. `make seminar4` служит только для Docker-сборки
+и проверки обоих вариантов; студенты выполняют команды вручную. Рабочие файлы
+`work/` исключены из Git, включая отдельный образ
+`work/grades.img`.
+Методичка варианта 2: `build/html/seminar04/index.html`, `build/pdf/seminar04/seminar04.pdf`
+и раздел в `build/pdf/adaptation_course.pdf`.
+Студенческий комплект: `build/html/seminar04/materials/` и
+`build/pdf/seminar04/materials/`. В каждой папке лежат только `README.md`,
+`hello.asm`, `boot16.asm`, `journal.asm`, `memory.c`, `memory.gdb`, без дерева
+`demos/` и дополнительных файлов. В архиве `journal.asm` — шестая версия
+лекционного журнала. Полная методичка расположена рядом с комплектом.
+Старая презентация сохранена для исторической сверки в `legacy/slides/seminar04/`.
+
+## Дополнительные материалы: Debian, Ubuntu, лабораторная и отчёт
+
+### Debian: установка и первое знакомство с терминалом
+
+[Дополнительная лабораторная](supplementary/debian-install/README.md) основана
+на черновике `drafts/linux_install_instruction.md` и предлагает выбрать один
+маршрут: VirtualBox с Debian amd64 в Windows x86-64; установка Debian второй
+системой на Windows x86-64 с UEFI; либо UTM с Debian arm64 на Mac Apple Silicon.
+После установки во всех маршрутах создают рабочий каталог, ставят инструменты,
+пишут и запускают `hello.c`. Проверяемый исходник в `reference/` не входит в
+студенческую публикацию. Отчёт отправляют преподавателю в PDF или HTML,
+сохраняя исходник отдельно.
+
+```sh
+make debian-install
+```
+
+Результаты: `build/html/debian-install/index.html`,
+`build/pdf/debian-install/debian-install.pdf` и соответствующая глава в
+`build/pdf/adaptation_course.pdf`. Самостоятельные HTML/PDF также публикуются
+на GitHub Pages и в артефактах сборки.
+
+Пошаговая методичка для компьютера с уже установленными Ubuntu и Windows:
+выбор Ubuntu в GRUB 2, запуск терминала, каталоги, файлы и редактор nano.
+Единый исходник — `supplementary/ubuntu-terminal/README.md`. В общем пособии
+это самостоятельная часть «Дополнительные материалы» перед литературой.
+Отдельные HTML и A4 PDF собираются в Docker:
+
+```sh
+make ubuntu-terminal
+```
+
+Результаты: `build/html/ubuntu-terminal/index.html`,
+`build/pdf/ubuntu-terminal/ubuntu-terminal.pdf` и раздел в
+`build/pdf/adaptation_course.pdf`. Команда `make pdf` также включает раздел
+в общее пособие, но не собирает отдельные HTML и PDF. При публикации
+методичка добавляется на GitHub Pages, в артефакты сборки и PDF релиза.
+
+### Демонстрационная лабораторная и образец отчёта
+
+Короткий опыт на C показывает путь «ожидание → неверный результат → GDB →
+исправление → повторные проверки». Студенты могут сравнить собственное
+оформление с заполненным образцом: исходники
+`supplementary/lab-report/README.md` и `supplementary/lab-report/report.md`.
+Отчёты по лабораторным **отправляют преподавателю в PDF или HTML**;
+исходники хранят отдельно для демонстрации. Собрать отдельные версии и
+общий PDF через Docker:
+
+```sh
+make lab-report
+```
+
+Результаты: `build/html/lab-report/index.html`,
+`build/html/lab-report/report.html`, `build/pdf/lab-report/demo-lab.pdf`,
+`build/pdf/lab-report/example-report.pdf` и разделы в общем
+`build/pdf/adaptation_course.pdf`. Проверяемые C-исходники находятся внутри
+`supplementary/lab-report/reference/` и не публикуются отдельным студенческим
+комплектом. Команда `make pdf` включает оба текста в общее пособие.
 
 ## GitHub Actions
 
@@ -323,10 +469,10 @@ make lecture4-journal-run STAGE=3 # ввод через BIOS INT 16h
 Он:
 
 - собирает Docker-образ;
-- проверяет расчёты и запускает `make lecture2 lecture2-original lecture4 lecture4-journal` (в том числе QEMU-проверки);
-- публикует пособие, PDF вариантов лекций №2 и №4 и общий ZIP HTML как artifact;
+- проверяет расчёты и запускает `make lecture2 lecture2-original lecture3 lecture4 lecture4-journal seminar4 ubuntu-terminal lab-report debian-install` (QEMU-проверки лекционной демонстрации не проверяют работы студентов);
+- публикует пособие, PDF лекций, методичку семинара и общий ZIP HTML как artifact;
 - при сборке ветки `master` размещает эти материалы в GitHub Pages;
-- при публикации GitHub Release прикрепляет пять PDF и общий ZIP HTML-презентаций.
+- при публикации GitHub Release прикрепляет PDF, архивы исходников занятий и общий ZIP HTML.
 
 Для регулярных сборок имя artifact содержит номер сборки, дату-время в UTC и короткий SHA коммита:
 
@@ -334,7 +480,7 @@ make lecture4-journal-run STAGE=3 # ввод через BIOS INT 16h
 adaptation-course-master-build-<run_number>-<YYYYMMDD-HHMMSSZ>-<short_sha>
 ```
 
-PDF внутри artifact называется аналогично:
+PDF внутри каталога `pdf/` загружаемого artifact называется аналогично:
 
 ```text
 adaptation_course-master-build-<run_number>-<YYYYMMDD-HHMMSSZ>-<short_sha>.pdf
@@ -343,7 +489,7 @@ adaptation_course-master-build-<run_number>-<YYYYMMDD-HHMMSSZ>-<short_sha>.pdf
 Для GitHub Pages публикуется актуальная версия:
 
 ```text
-adaptation_course-latest.pdf
+pdf/adaptation_course.pdf
 ```
 
 Для релизов версия берётся из тега релиза, например:

@@ -1,7 +1,9 @@
 import { cp, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { resolve, extname, sep } from 'node:path';
+import { resolve, extname, sep, dirname, relative } from 'node:path';
 import { chromium } from 'playwright';
+import { presentationPaths } from './publication.mjs';
+import { publishMaterials } from './materials.mjs';
 
 const workspace = process.cwd();
 const build = resolve(workspace, process.argv[2] || 'build');
@@ -9,9 +11,19 @@ const id = process.argv[3] || 'lecture02';
 const presentations = JSON.parse(await readFile(resolve(workspace, 'slides/presentations.json'), 'utf8'));
 if (!Object.hasOwn(presentations, id)) throw new Error(`Unknown presentation: ${id}`);
 const expected = presentations[id];
-const output = resolve(build, 'slides');
+const paths = presentationPaths(id, expected);
+const output = resolve(build, 'html');
+const deck = resolve(build, paths.html);
 await mkdir(output, { recursive: true });
-await cp(resolve(workspace, 'slides', id), resolve(output, id), { recursive: true });
+await mkdir(dirname(deck), { recursive: true });
+await cp(resolve(workspace, 'slides', id), deck, { recursive: true });
+if (expected.variant) {
+  // The editable sources are one level below theme/vendor; published variants are two.
+  const index = resolve(deck, 'index.html');
+  const html = await readFile(index, 'utf8');
+  await writeFile(index, html.replaceAll('../vendor/', '../../vendor/').replaceAll('../theme/', '../../theme/'));
+}
+await publishMaterials(workspace, build, paths.lesson);
 await cp(resolve(workspace, 'slides/theme'), resolve(output, 'theme'), { recursive: true });
 await mkdir(resolve(output, 'vendor/reveal'), { recursive: true });
 for (const name of ['dist', 'plugin', 'LICENSE']) {
@@ -51,7 +63,7 @@ try {
     }
     return route.continue();
   });
-  const url = `http://127.0.0.1:${server.address().port}/${id}/index.html`;
+  const url = `http://127.0.0.1:${server.address().port}/${relative(output, deck).split(sep).join('/')}/index.html`;
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.evaluate(async () => { await window.courseReady; await document.fonts.ready; });
   const report = await page.evaluate(expected => {
@@ -96,11 +108,13 @@ try {
   // Reveal injects print CSS with !important: catch padding resets before PDF export.
   const printPadding = await page.evaluate(() => [...document.querySelectorAll('.slides section')].map(s => getComputedStyle(s).paddingLeft));
   if (printPadding.some(padding => parseFloat(padding) < 80)) throw new Error(`Print padding reset: ${printPadding}`);
-  await page.pdf({ path: resolve(build, expected.pdf), printBackground: true,
+  const pdf = resolve(build, paths.pdf);
+  await mkdir(dirname(pdf), { recursive: true });
+  await page.pdf({ path: pdf, printBackground: true,
     width: '1280px', height: '720px', preferCSSPageSize: true, margin: { top: 0, bottom: 0, left: 0, right: 0 } });
   if (errors.length) throw new Error(errors.join('\n'));
-  console.log(`Built ${report.slides} slides (${report.main} main): ${output}/${id}/index.html`);
-  console.log(`PDF: ${build}/${expected.pdf}`);
+  console.log(`Built ${report.slides} slides (${report.main} main): ${deck}/index.html`);
+  console.log(`PDF: ${pdf}`);
 } finally {
   if (browser) await browser.close();
   await new Promise(resolve => server.close(resolve));

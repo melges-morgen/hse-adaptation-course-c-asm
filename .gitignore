@@ -1,4 +1,5 @@
 build/
+work/
 dist/
 *.aux
 *.log
@@ -9,3 +10,5 @@ dist/
 *.synctex.gz
 *.pdf
 node_modules/
+__pycache__/
+*.py[cod]

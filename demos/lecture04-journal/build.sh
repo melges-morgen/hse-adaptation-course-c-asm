@@ -2,10 +2,11 @@
 set -eu
 stage="${1:-6}"
 case "$stage" in 1|2|3|4|5|6) ;; *) exit 2 ;; esac
-out="build/lecture04-journal/stage$stage"
+out="${JOURNAL_OUT:-build/lecture04-journal/stage$stage}"
+source="${JOURNAL_SOURCE:-demos/lecture04-journal/stages/stage$stage/journal.asm}"
 mkdir -p "$out"
 nasm -f bin demos/lecture04-journal/boot16.asm -o "$out/boot.bin"
-nasm -f bin -DSTAGE="$stage" demos/lecture04-journal/journal16.asm -o "$out/journal.bin"
+nasm -f bin "$source" -o "$out/journal.bin"
 python3 -c '
 from pathlib import Path
 import sys

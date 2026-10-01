@@ -1,69 +1,48 @@
-; 16-bit NASM, real mode. BIOS boots a floppy; grades use a separate HDD.
-bits 16
-org 0
-%ifndef STAGE
-%define STAGE 6
-%endif
+; BIOS уже прочитал код с дискеты в RAM по адресу 1000:0000.
+; Этап 5: целочисленное среднее по выставленным оценкам.
+; Запись 0x... — шестнадцатеричное число, ; начинает комментарий.
+; Слева от запятой — место для результата; [адрес] — обращение к RAM.
+; push/pop сохраняют/восстанавливают регистр в стеке, call/ret вызывают
+; подпрограмму и возвращают управление, jmp/je/jc — переходы.
+; bits/org/%define/db/dw/times — директивы сборки, не инструкции CPU.
+bits 16                       ; собирать 16-битные инструкции
+org 0                         ; начало кода имеет смещение 0000h
 %define UNSET 0xff
 %define STUDENTS 16
 %define WORKS 4
 
 entry:
-    cli
-    mov ax, cs
-    mov ds, ax
-    mov es, ax
-    mov ax, 0x7000
-    mov ss, ax
-    mov sp, 0xf000
-    sti
+    cli                         ; запретить IRQ, пока настраиваем стек
+    mov ax, cs                  ; AX = сегмент загруженного кода (1000h)
+    mov ds, ax                  ; DS = сегмент данных программы
+    mov es, ax                  ; ES = сегмент назначения строковых команд
+    mov ax, 0x7000              ; выбрать отдельный сегмент для стека
+    mov ss, ax                  ; SS = 7000h
+    mov sp, 0xf000              ; SP = вершина стека; стек растёт вниз
+    sti                         ; разрешить IRQ после настройки стека
     call serial_init
     mov si, msg_boot
     call serial_str
-    mov al, STAGE + '0'
+    mov al, '5'
     call serial_char
     mov si, msg_lf
     call serial_str
-    mov di, grades
-    mov cx, 64
-    mov al, UNSET
-    rep stosb                   ; explicit sentinel: zero is a valid grade
-%if STAGE >= 6
-    call load_grades
-%endif
-%if STAGE = 1
-    mov ax, 0x0003
-    int 0x10                    ; BIOS: text mode
-    mov si, first_record
-    call bios_text
-%else
-    call redraw                ; from stage 2: write VGA memory directly
-%endif
-%if STAGE >= 4
+    mov di, grades              ; ES:DI → начало массива оценок
+    mov cx, 64                  ; нужно заполнить 64 байта
+    mov al, UNSET               ; FF = «нет оценки» (0 — оценка)
+    rep stosb                   ; повторить запись AL в ES:DI 64 раза
+    call redraw                 ; с версии 2 писать напрямую в VGA
     call install_irq1
-%endif
     mov si, msg_ready
     call serial_str
 .loop:
-%if STAGE = 3
-    mov ah, 0x01
-    int 0x16                    ; BIOS: key available?
-    jz .loop
-    xor ah, ah
-    int 0x16                    ; BIOS: read key, scan code in AH
-    mov al, ah
-    call handle_scan
-%elif STAGE >= 4
     call dequeue
     jc .loop
     call handle_scan
-%else
-    hlt
-%endif
     jmp .loop
 
-; VGA cell: physical B8000 = segment B800, offset 0; 2 bytes per cell.
-vga_text:                      ; BH row, BL column, DS:SI zero-terminated
+; Ячейка VGA: физический B8000 = сегмент B800, смещение 0; 2 байта.
+vga_text:                      ; BH=строка, BL=столбец, DS:SI=строка с нулём
     push ax
     push cx
     push dx
@@ -78,15 +57,15 @@ vga_text:                      ; BH row, BL column, DS:SI zero-terminated
     mov al, bl
     shl ax, 1
     add di, ax
-    mov ax, 0xb800
-    mov es, ax
+    mov ax, 0xb800              ; сегмент видеопамяти VGA
+    mov es, ax                  ; ES:DI будет адресом записи на экран
 .next:
-    lodsb
-    test al, al
-    jz .done
-    mov ah, 0x0f
-    stosw
-    jmp .next
+    lodsb                       ; прочитать символ DS:SI в AL; SI += 1
+    test al, al                 ; проверить, равен ли символ нулю
+    jz .done                    ; нуль означает конец строки
+    mov ah, 0x0f                ; AH = атрибут цвета, AL = символ
+    stosw                       ; записать AX в ES:DI; DI += 2
+    jmp .next                   ; перейти к следующему символу
 .done:
     pop es
     pop di
@@ -111,22 +90,6 @@ vga_two:                       ; AL=0..10, BH=row BL=col
     call vga_text
     pop si
     pop dx
-    pop bx
-    pop ax
-    ret
-
-bios_text:                     ; stage 1: INT 10h teletype output
-    push ax
-    push bx
-.next:
-    lodsb
-    test al, al
-    jz .done
-    mov ah, 0x0e
-    mov bx, 0x0007
-    int 0x10
-    jmp .next
-.done:
     pop bx
     pop ax
     ret
@@ -198,7 +161,6 @@ redraw:
     inc dl
     cmp dl, WORKS
     jb .work
-%if STAGE >= 5
     mov [current_count], dh
     push cx
     mov bx, 0x041f
@@ -210,7 +172,7 @@ redraw:
     mul si
     xor ch, ch
     mov cl, [current_count]
-    shr cl, 1
+    xor cl, cl                  ; ЗАДАНИЕ 5: прибавить count/2
     add ax, cx
     xor ch, ch
     mov cl, [current_count]
@@ -232,11 +194,8 @@ redraw:
 .avg_missing:
     mov si, missing_avg
     call vga_text
-%endif
 .next_student:
-%if STAGE >= 5
     pop cx
-%endif
     inc cl
     cmp cl, STUDENTS
     jb .student
@@ -255,7 +214,7 @@ redraw:
     pop ax
     ret
 
-; Input value in AL: PS/2 set-1 make code (or BIOS INT 16h AH scan code).
+; В AL приходит скан-код из очереди IRQ1.
 handle_scan:
     push ax
     push bx
@@ -314,12 +273,6 @@ handle_scan:
     inc byte [work]
     jmp .changed
 .normal:
-%if STAGE >= 6
-    cmp al, 0x1f                ; S
-    je .save
-    cmp al, 0x26                ; L
-    je .load
-%endif
     cmp al, 0x0e                ; Backspace
     je .erase
     cmp al, 0x1e                ; A=10
@@ -350,16 +303,6 @@ handle_scan:
     call report_grade
     call redraw
     jmp .done
-%if STAGE >= 6
-.save:
-    call save_grades
-    call redraw
-    jmp .done
-.load:
-    call load_grades
-    call redraw
-    call report_grade
-%endif
 .done:
     pop dx
     pop cx
@@ -367,15 +310,14 @@ handle_scan:
     pop ax
     ret
 
-; IRQ1 vector 09h on the BIOS-compatible PIC. We no longer use INT 16h.
-%if STAGE >= 4
+; IRQ1 идёт через вектор 09h PIC; начиная с версии 4 INT 16h не читаем.
 install_irq1:
-    cli
-    xor ax, ax
-    mov es, ax
-    mov word [es:9*4], irq1
-    mov ax, cs
-    mov word [es:9*4+2], ax
+    cli                         ; не принимать IRQ, пока меняем IVT
+    xor ax, ax                  ; AX = 0
+    mov es, ax                  ; ES = 0: IVT начинается с адреса 0000:0000
+    mov word [es:9*4], irq1     ; вектор 09h: смещение обработчика
+    mov ax, cs                  ; AX = сегмент кода обработчика
+    mov word [es:9*4+2], ax     ; вектор 09h: сегмент обработчика
     mov ax, cs
     mov es, ax
     in al, 0x21
@@ -388,19 +330,19 @@ install_irq1:
     in al, 0x60
     jmp .drain
 .ready:
-    sti
+    sti                         ; PIC готов: снова разрешить IRQ
     ret
 
 irq1:
-    push ax
+    push ax                     ; сохранить используемые регистры
     push bx
     push ds
-    mov ax, cs
-    mov ds, ax
-    in al, 0x64
-    test al, 1
-    jz .eoi
-    in al, 0x60
+    mov ax, cs                  ; данные очереди лежат в нашем сегменте
+    mov ds, ax                  ; DS → очередь и её индексы
+    in al, 0x64                 ; прочитать статус PS/2
+    test al, 1                  ; установлен ли бит готовых данных?
+    jz .eoi                     ; если нет, просто подтвердить IRQ
+    in al, 0x60                 ; прочитать байт клавиши
     mov bl, [qhead]
     mov bh, bl
     inc bh
@@ -412,12 +354,12 @@ irq1:
     inc byte [qhead]
     and byte [qhead], 63
 .eoi:
-    mov al, 0x20
-    out 0x20, al
-    pop ds
+    mov al, 0x20                ; команда EOI для PIC
+    out 0x20, al                ; сообщить о завершении IRQ
+    pop ds                      ; восстановить регистры в обратном порядке
     pop bx
     pop ax
-    iret
+    iret                        ; вернуть сохранённые адрес и флаги
 
 dequeue:                        ; AL=scan, CF=0 if available
     push bx
@@ -435,9 +377,8 @@ dequeue:                        ; AL=scan, CF=0 if available
     stc
     pop bx
     ret
-%endif
 
-; COM1 is a test-only diagnostic channel, not the student's display.
+; COM1 — канал диагностики теста, а не экран пользователя.
 serial_init:
     mov dx, 0x3f9
     xor al, al
@@ -543,42 +484,41 @@ report_grade:
     xor ah, ah
     call serial_uint
 .average:
-%if STAGE >= 5
     mov si, msg_avg
     call serial_str
     mov bl, [student]
     xor bh, bh
     shl bx, 2
-    mov cx, WORKS
-    xor dx, dx                   ; DL count, DH sum
+    mov cx, WORKS               ; пройти четыре оценки студента
+    xor dx, dx                  ; DL = количество, DH = сумма
 .sum:
-    mov al, [grades+bx]
-    cmp al, UNSET
-    je .skip
-    inc dl
-    add dh, al
+    mov al, [grades+bx]        ; взять оценку из RAM
+    cmp al, UNSET              ; сравнить с FF («нет оценки»)
+    je .skip                   ; пропустить FF
+    inc dl                     ; увеличить число оценок
+    add dh, al                 ; прибавить оценку к сумме
 .skip:
-    inc bx
-    loop .sum
+    inc bx                     ; перейти к следующему байту
+    loop .sum                  ; уменьшить CX и повторить, пока CX ≠ 0
     test dl, dl
     jnz .have
     mov si, missing_avg
     call serial_str
     jmp .endavg
 .have:
-    mov [current_count], dl
-    xor ax, ax
-    mov al, dh
-    mov bx, 100
-    mul bx
+    mov [current_count], dl    ; сохранить количество оценок
+    xor ax, ax                 ; AX = 0
+    mov al, dh                 ; AX = сумма
+    mov bx, 100                ; перейти от единиц к сотым
+    mul bx                     ; DX:AX = сумма × 100
     xor ch, ch
     mov cl, [current_count]
-    shr cl, 1
+    xor cl, cl                  ; ЗАДАНИЕ 5: прибавить count/2
     add ax, cx
     xor ch, ch
     mov cl, [current_count]
-    xor dx, dx
-    div cx
+    xor dx, dx                 ; старшая часть делимого равна нулю
+    div cx                     ; AX = округлённое среднее в сотых
     mov bx, 100
     xor dx, dx
     div bx                       ; AX integer, DX fractional 0..99
@@ -595,7 +535,6 @@ report_grade:
 .twodigits:
     call serial_uint
 .endavg:
-%endif
     mov si, msg_lf
     call serial_str
     pop si
@@ -604,203 +543,11 @@ report_grade:
     pop bx
     pop ax
     ret
-
-%if STAGE >= 6
-; 512-byte sector: GR16, version/dimensions, 64 grades, 16-bit sum.
-checksum:                       ; AX=sum(bytes 0..71), unsigned modulo 65536
-    push bx
-    push cx
-    mov bx, sector
-    mov cx, 72
-    xor ax, ax
-.next:
-    xor dx, dx
-    mov dl, [bx]
-    add ax, dx
-    inc bx
-    loop .next
-    pop cx
-    pop bx
-    ret
-
-disk_io:                        ; AH=0 read / AH=1 write; CF on error
-    push ax
-    push bx
-    push cx
-    push dx
-    push si
-    push ds
-    mov bl, ah
-    mov ax, cs
-    mov ds, ax
-    mov si, dap
-    mov dl, 0x80                ; first HDD; boot floppy is DL=0
-    mov ah, 0x42                ; BIOS INT 13h extensions: LBA read
-    cmp bl, 0
-    je .bios
-    mov ah, 0x43                ; LBA write
-    xor al, al
-.bios:
-    int 0x13
-    jc .error
-    clc
-    jmp .done
-.error:
-    stc
-.done:
-    pop ds
-    pop si
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    ret
-
-set_notice:                     ; DS:SI status, also COM1
-    push ax
-    push cx
-    push di
-    push si
-    mov di, notice
-    mov cx, 31
-.copy:
-    lodsb
-    stosb
-    test al, al
-    jz .log
-    loop .copy
-    mov byte [di], 0
-.log:
-    pop si
-    call serial_str
-    mov si, msg_lf
-    call serial_str
-    pop di
-    pop cx
-    pop ax
-    ret
-
-save_grades:
-    push ax
-    push cx
-    push si
-    push di
-    push es
-    mov ax, ds
-    mov es, ax
-    mov di, sector
-    mov cx, 256
-    xor ax, ax
-    rep stosw
-    mov byte [sector], 'G'
-    mov byte [sector+1], 'R'
-    mov byte [sector+2], '1'
-    mov byte [sector+3], '6'
-    mov byte [sector+4], 1
-    mov byte [sector+5], STUDENTS
-    mov byte [sector+6], WORKS
-    mov si, grades
-    mov di, sector+8
-    mov cx, 64
-    rep movsb
-    call checksum
-    mov [sector+72], ax
-    mov ah, 1
-    call disk_io
-    mov si, msg_saved
-    jnc .notice
-    mov si, msg_no_disk
-.notice:
-    call set_notice
-    pop es
-    pop di
-    pop si
-    pop cx
-    pop ax
-    ret
-
-load_grades:
-    push ax
-    push bx
-    push cx
-    push si
-    push di
-    push es
-    xor ah, ah
-    call disk_io
-    mov si, msg_no_disk
-    jc .notice
-    cmp word [sector], 0
-    jne .magic
-    cmp word [sector+2], 0
-    jne .magic
-    mov si, msg_empty
-    jmp .notice
-.magic:
-    mov si, msg_bad_format
-    cmp byte [sector], 'G'
-    jne .notice
-    cmp byte [sector+1], 'R'
-    jne .notice
-    cmp byte [sector+2], '1'
-    jne .notice
-    cmp byte [sector+3], '6'
-    jne .notice
-    mov si, msg_bad_version
-    cmp byte [sector+4], 1
-    jne .notice
-    cmp byte [sector+5], STUDENTS
-    jne .notice
-    cmp byte [sector+6], WORKS
-    jne .notice
-    cmp byte [sector+7], 0
-    jne .notice
-    call checksum
-    mov si, msg_bad_checksum
-    cmp ax, [sector+72]
-    jne .notice
-    mov si, sector+8
-    mov cx, 64
-.check:
-    lodsb
-    cmp al, UNSET
-    je .valid
-    cmp al, 10
-    ja .bad_grade
-.valid:
-    loop .check
-    mov ax, ds
-    mov es, ax
-    mov si, sector+8
-    mov di, grades
-    mov cx, 64
-    rep movsb                   ; only now change live scores
-    mov si, msg_loaded
-    jmp .notice
-.bad_grade:
-    mov si, msg_bad_grade
-.notice:
-    call set_notice
-    pop es
-    pop di
-    pop si
-    pop cx
-    pop bx
-    pop ax
-    ret
-
-dap: db 16, 0
-     dw 1                       ; sector count
-     dw sector, 0x1000          ; buffer offset:segment
-     dq 1                       ; LBA 1 on separate HDD
-sector: times 512 db 0
-%endif
 
 title_text: db 'COURSE GRADES - BIOS / NASM 16-BIT', 0
-help_text: db 'arrows:select 0-9/A:grade Backspace:clear S:save L:load', 0
+help_text: db 'arrows:select 0-9/A:grade Backspace:clear', 0
 headings: db 'ID     W1   W2   W3   W4    AVG', 0
 footer_text: db 'QEMU PC / BIOS / VGA / PS2 / real mode', 0
-first_record: db 'S01  grade 07', 0
 label_student: db 'S', 0
 missing_text: db '--', 0
 missing_avg: db '--.--', 0
@@ -823,11 +570,3 @@ msg_grade: db 'GRADE S', 0
 msg_work: db ' W', 0
 msg_avg: db ' AVG=', 0
 msg_lf: db 13, 10, 0
-msg_saved: db 'SAVED', 0
-msg_loaded: db 'LOADED', 0
-msg_no_disk: db 'NO_DISK', 0
-msg_empty: db 'EMPTY', 0
-msg_bad_format: db 'BAD_FORMAT', 0
-msg_bad_version: db 'UNSUPPORTED_VERSION', 0
-msg_bad_checksum: db 'BAD_CHECKSUM', 0
-msg_bad_grade: db 'BAD_GRADE', 0

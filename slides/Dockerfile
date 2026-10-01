@@ -6,6 +6,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /opt/slides
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
-COPY build.mjs ./
+COPY build.mjs materials.mjs publication.mjs ./
 WORKDIR /workspace
 ENTRYPOINT ["node", "/opt/slides/build.mjs"]

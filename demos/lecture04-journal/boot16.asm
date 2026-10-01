@@ -1,47 +1,50 @@
-; BIOS loads this sector at 0000:7c00. A 1.44 MiB floppy has 18 sectors/track.
-bits 16
-org 0x7c00
+; BIOS кладёт этот сектор дискеты в RAM по адресу 0000:7C00.
+; На одной дорожке учебной дискеты 18 секторов по 512 байтов.
+; Запись 0x... означает шестнадцатеричное число; после ; идёт комментарий.
+; Команды ниже выполняет CPU, директивы bits/org/db/dw/times — NASM при сборке.
+bits 16                         ; собирать инструкции для 16-битного режима
+org 0x7c00                      ; считать адрес начала сектора равным 7C00h
 
-start:
-    cli
-    xor ax, ax
-    mov ds, ax
-    mov ss, ax
-    mov sp, 0x7c00
-    sti
-    mov [boot_drive], dl
-    mov ax, 0x1000
-    mov es, ax
-    xor bx, bx
-    mov ah, 0x02                 ; BIOS: read sectors (CHS)
-    mov al, 17                   ; sectors 2..18 of cylinder 0, head 0
-    xor ch, ch
-    mov cl, 2
-    xor dh, dh
-    mov dl, [boot_drive]
-    int 0x13
-    jc boot_error
-    cmp al, 17
-    jne boot_error
-    mov dl, [boot_drive]
-    jmp 0x1000:0x0000            ; code and data are now in RAM
+start:                          ; метка: сюда BIOS передаёт управление
+    cli                         ; временно запретить аппаратные прерывания
+    xor ax, ax                  ; AX = 0 (XOR регистра с самим собой)
+    mov ds, ax                  ; DS = 0, адреса данных относятся к сегменту 0
+    mov ss, ax                  ; SS = 0, задать сегмент стека
+    mov sp, 0x7c00              ; стек растёт вниз от адреса 0000:7C00
+    sti                         ; снова разрешить аппаратные прерывания
+    mov [boot_drive], dl        ; сохранить переданный BIOS номер диска в RAM
+    mov ax, 0x1000              ; база будущего буфера: 1000h × 16 = 10000h
+    mov es, ax                  ; ES = 1000h; он не изменится при смене AX
+    xor bx, bx                  ; BX = 0; ES:BX указывает на начало буфера
+    mov ah, 0x02                ; AH = функция BIOS: чтение секторов (CHS)
+    mov al, 17                  ; AL = 17 секторов: номера 2..18
+    xor ch, ch                  ; CH = 0, номер цилиндра
+    mov cl, 2                   ; CL = 2, первый читаемый сектор
+    xor dh, dh                  ; DH = 0, номер головки
+    mov dl, [boot_drive]        ; DL = дискета, с которой загрузил BIOS
+    int 0x13                    ; вызвать дисковый обработчик BIOS из IVT
+    jc boot_error               ; если CF = 1, перейти к сообщению об ошибке
+    cmp al, 17                  ; сравнить число прочитанных секторов с 17
+    jne boot_error              ; если не равно, чтение было неполным
+    mov dl, [boot_drive]        ; передать номер диска загруженной программе
+    jmp 0x1000:0x0000           ; CS:IP = 1000:0000, исполнять код в RAM
 
 boot_error:
-    mov si, error_text
-.print:
-    lodsb
-    test al, al
-    jz .halt
-    mov ah, 0x0e
-    mov bx, 0x0007
-    int 0x10
-    jmp .print
+    mov si, error_text          ; SI = адрес первого символа сообщения
+.print:                         ; метка начала цикла вывода
+    lodsb                       ; прочитать байт DS:SI в AL и сдвинуть SI
+    test al, al                 ; проверить, не нулевой ли это конец строки
+    jz .halt                    ; если нуль, прекратить вывод
+    mov ah, 0x0e                ; выбрать BIOS-видеосервис вывода символа
+    mov bx, 0x0007              ; страница 0, атрибут 07h
+    int 0x10                    ; вывести символ из AL через BIOS
+    jmp .print                  ; повторить для следующего символа
 .halt:
-    cli
-    hlt
-    jmp .halt
+    cli                         ; запретить прерывания перед остановкой
+    hlt                         ; остановить CPU до внешнего события
+    jmp .halt                   ; если выполнение возобновится, остановить снова
 
-boot_drive: db 0
-error_text: db 'BOOT ERROR', 0
-times 510 - ($ - $$) db 0
-dw 0xaa55
+boot_drive: db 0                ; один байт под номер загрузочной дискеты
+error_text: db 'BOOT ERROR', 0  ; строка с завершающим нулевым байтом
+times 510 - ($ - $$) db 0       ; дополнить сектор нулями до байта 510
+dw 0xaa55                       ; сигнатура 55 AA в последних двух байтах

@@ -1,0 +1,275 @@
+% Архив прежнего текста; действующая методичка собирается из demos/seminar04/README.md.
+\label{seminar04}
+\begingroup
+\setlength{\emergencystretch}{2em}
+\subsection*{Цель, время и порядок работы}
+За 90 минут студент на своём актуальном Debian установит инструменты,
+самостоятельно соберёт и запустит односекторную BIOS-программу, затем
+соберёт готовый журнал на 16-битном NASM и исследует вывод, ввод,
+вычисления и сохранение в отдельный диск. Дома на это выделены ещё
+180 минут. Студент выполняет команды терминала сам; проверяет экран,
+вывод и образ диска своими наблюдениями и записывает их в отчёте.
+Команды ниже выполняются из рабочего каталога, который создаётся
+внутри репозитория. Для лабораторной не нужны Docker, make или
+автоматические тесты; требуются Debian с графической средой и доступом
+к \texttt{sudo}. Проверки материалов преподавателем в контейнерах
+не являются частью действий студента.
+
+\subsection*{В аудитории: 90 минут}
+\paragraph{0--10 минут: пакеты Debian.}
+В терминале установите необходимые программы:
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+sudo apt update
+sudo apt install qemu-system-x86 qemu-system-gui \
+    nasm gcc gdb binutils
+nasm -v
+qemu-system-i386 --version
+gcc --version
+gdb --version
+objdump --version
+\end{lstlisting}
+\texttt{apt update} обновляет сведения о пакетах, \texttt{apt install}
+устанавливает ассемблер NASM, эмулятор ПК QEMU с окном GTK,
+компилятор C, отладчик GDB и binutils. Флаги \texttt{--version} и
+\texttt{-v} проверяют, что команды доступны; точная версия зависит
+от Debian. Для просмотра машинных байтов понадобятся также штатные
+\texttt{wc}, \texttt{od}, \texttt{dd}, \texttt{cp}, \texttt{truncate}.
+
+\paragraph{10--25 минут: первый загрузочный сектор.}
+Создайте рабочий каталог, не затирая существующую копию исходника:
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+mkdir -p work/seminar04
+cp -n demos/seminar04/hello.asm work/seminar04/hello.asm
+cd work/seminar04
+\end{lstlisting}
+Прочитайте \texttt{hello.asm}: \texttt{bits 16}, \texttt{org 0x7c00},
+установку \texttt{DS} и \texttt{SS:SP}, цикл \texttt{lodsb},
+BIOS \texttt{INT 10h}, дополнение \texttt{times} и подпись сектора.
+Соберите плоский бинарный файл, посмотрите его длину и последние байты:
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+nasm -f bin hello.asm -o hello.bin
+wc -c hello.bin
+od -An -tx1 -j 510 -N 2 hello.bin
+ndisasm -b 16 hello.bin
+cp hello.bin hello.img
+truncate -s 1440K hello.img
+wc -c hello.img
+\end{lstlisting}
+В NASM \texttt{-f bin} означает плоские машинные байты без заголовка ELF,
+\texttt{-o} задаёт выходной файл. \texttt{wc -c} считает байты:
+загрузочный сектор должен иметь размер 512 байтов.
+У \texttt{od} параметр \texttt{-An} убирает колонку адресов,
+\texttt{-tx1} показывает каждый байт в hex, \texttt{-j 510}
+пропускает 510 байтов, \texttt{-N 2} читает два байта подписи
+\texttt{55 AA}. Команда \texttt{ndisasm -b 16} читает байты как
+16-битные инструкции, но не знает, где закончился выполняемый код:
+строку, нули и подпись она тоже может показать как команды.
+\texttt{truncate -s 1440K} доводит образ дискеты
+до $1440\cdot1024$ байтов.
+
+Запустите этот файл в QEMU:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+qemu-system-i386 -machine pc -m 16M -boot order=a \
+  -drive file=hello.img,format=raw,if=floppy \
+  -display gtk -no-reboot
+\end{lstlisting}
+\texttt{-machine pc} выбирает BIOS-совместимый ПК, \texttt{-m 16M}
+выделяет 16 MiB RAM гостю, \texttt{-boot order=a} выбирает дискету
+первой для загрузки. У \texttt{-drive} параметры \texttt{file},
+\texttt{format=raw}, \texttt{if=floppy} задают файл без заголовка
+контейнера и его интерфейс. \texttt{-display gtk} открывает отдельное
+окно, \texttt{-no-reboot} запрещает автоматический перезапуск гостя.
+Проверьте надпись \texttt{HELLO BIOS}, поменяйте сообщение на короткое
+латинское, повторите сборку и запуск и запишите наблюдения.
+Этот бинарник не запускают командой \texttt{./hello.bin} в Linux.
+
+\paragraph{25--35 минут: полный журнал.}
+Из рабочего каталога вернитесь в корень репозитория за исходниками,
+затем снова войдите в рабочий каталог:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+cd ../..
+cp -n demos/lecture04-journal/boot16.asm work/seminar04/boot16.asm
+cp -n demos/lecture04-journal/stages/stage6/journal.asm \
+  work/seminar04/journal.asm
+cd work/seminar04
+nasm -f bin boot16.asm -o boot.bin
+nasm -f bin journal.asm -o journal.bin
+wc -c boot.bin journal.bin
+\end{lstlisting}
+\texttt{boot.bin} должен занимать 512 байтов; код журнала должен
+уместиться в следующие 17 секторов по 512 байтов каждый. Найдите
+максимальную длину самостоятельно. Сборка дискеты тремя действиями:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+dd if=/dev/zero of=boot.img bs=512 count=2880
+dd if=boot.bin of=boot.img bs=512 conv=notrunc
+dd if=journal.bin of=boot.img bs=512 seek=1 conv=notrunc
+wc -c boot.img
+\end{lstlisting}
+\texttt{if=} и \texttt{of=} --- источник и результат,
+\texttt{bs=512} задаёт размер блока, \texttt{count=2880}
+задаёт число блоков на дискете объёмом 1,44 MiB. У третьего
+\texttt{dd} параметр \texttt{seek=1} пропускает \emph{один блок
+выходного файла}: журнал начинается со второго сектора.
+\texttt{conv=notrunc} сохраняет оставшуюся часть образа.
+
+Создайте \emph{один раз} отдельный HDD и запустите журнал:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+truncate -s 1M grades.img
+qemu-system-i386 -machine pc -m 16M -boot order=a \
+  -drive file=boot.img,format=raw,if=floppy \
+  -drive file=grades.img,format=raw,if=ide,index=0,media=disk \
+  -display gtk -serial stdio -monitor none -no-reboot
+\end{lstlisting}
+Второй \texttt{-drive} подключает \emph{отдельный} диск:
+\texttt{if=ide} задаёт интерфейс IDE, \texttt{index=0} выбирает
+первый накопитель, \texttt{media=disk} отличает HDD от дискеты.
+Для BIOS это диск \texttt{80h}. \texttt{-serial stdio} выводит COM1
+в терминал, \texttt{-monitor none} отключает консоль команд QEMU.
+Проверьте исходное поведение: 0, стрелка вправо, A, S,
+\texttt{SAVED}; завершите QEMU, запустите той же командой,
+увидьте \texttt{LOADED}. После изменения программы повторите NASM
+для \texttt{journal.bin} и все три команды \texttt{dd} для чистой
+дискеты: старые байты после сокращённой программы не должны оставаться
+в образе. Не создавайте заново \texttt{grades.img}, иначе сравнение
+сохранений потеряет смысл.
+
+\paragraph{35--50 минут: вывод, цвет и позиция.}
+В \texttt{journal.asm}, процедуре \texttt{vga\_text}, найдите
+\texttt{mov ah,0x0f} и сделайте текст жёлтым на синем фоне без мигания.
+Таблица кодов текстового VGA:
+\begin{center}\small
+\begin{tabular}{|c|l|c|l|}\hline
+Код & Цвет & Код & Цвет \\ \hline
+0 & чёрный & 8 & тёмно-серый \\
+1 & синий & 9 & ярко-синий \\
+2 & зелёный & A & ярко-зелёный \\
+3 & бирюзовый & B & ярко-бирюзовый \\
+4 & красный & C & ярко-красный \\
+5 & пурпурный & D & ярко-пурпурный \\
+6 & коричневый & E & жёлтый \\
+7 & светло-серый & F & белый \\ \hline
+\end{tabular}\end{center}
+В атрибуте бит 7 --- мигание (здесь 0), биты 6--4 --- фон
+(0--7), биты 3--0 --- цвет символа (0--F). Вычислите
+$16\cdot\text{код фона}+\text{код символа}$ сами. Одна позиция
+VGA состоит из байта символа и байта атрибута.
+
+В \texttt{redraw} найдите \texttt{mov bx,0x0001} перед
+\texttt{mov si,title\_text}. Перенесите заголовок на строку 2,
+столбец 5. Координаты начинаются с нуля, \texttt{BH} обозначает
+строку, \texttt{BL} --- столбец. Рассчитайте новую константу
+\texttt{BX} $=256\cdot\text{строка}+\text{столбец}$, смещение
+$2\cdot(80\cdot\text{строка}+\text{столбец})$ и физический адрес
+первой буквы от \texttt{B800:0000}. После сборки проверьте положение
+и цвет в окне QEMU.
+
+\paragraph{50--60 минут: ввод клавиш.}
+В \texttt{handle\_scan}, ветке \texttt{.normal}, найдите сравнения
+перед \texttt{.save} и \texttt{.load}. Назначьте Q для сохранения,
+E для загрузки вместо S/L; обновите строку \texttt{help\_text}.
+Сравниваются скан-коды PS/2 set 1, \emph{не ASCII}. Их десятичные
+значения: S --- 31, L --- 38, Q --- 16, E --- 18, A --- 30.
+Переведите новые коды в hex самостоятельно. Проверьте новые и старые
+клавиши по строкам \texttt{SAVED}/\texttt{LOADED} в терминале.
+
+\paragraph{60--75 минут: вычисления.}
+Клавиша A должна выставлять 12 вместо 10. Найдите в
+\texttt{handle\_scan} метку \texttt{.ten}, а в
+\texttt{load\_grades} метку \texttt{.check}; поменяйте выдаваемую
+оценку и максимальную допустимую оценку при загрузке. Обновите
+подсказку. Делитель 10 в \texttt{vga\_two} сохраняется: он делит
+число на десятичные разряды, а не проверяет предел оценки.
+Рассчитайте вручную средние $12,0$ и $12,1,1$ с округлением до
+сотых, проверьте на экране и после сохранения и перезапуска.
+
+\paragraph{75--85 минут: новый сектор HDD.}
+В \texttt{dap} найдите поле \texttt{dq 1}, номер LBA. Требуется
+запись с байта 4096 отдельного HDD; сектор имеет 512 байтов.
+Вычислите $LBA=4096/512$ и измените поле. Сохраните старый диск
+как копию и запустите опыт с новым файлом:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+cp -n grades.img grades-lab.img
+qemu-system-i386 -machine pc -m 16M -boot order=a \
+  -drive file=boot.img,format=raw,if=floppy \
+  -drive file=grades-lab.img,format=raw,if=ide,index=0,media=disk \
+  -display gtk -serial stdio -monitor none -no-reboot
+\end{lstlisting}
+В новом секторе изначально может быть \texttt{EMPTY}. Выставьте
+12 и 0, сохраните Q, повторите запуск с \emph{той же копией} и
+увидьте \texttt{LOADED}. Найдите \texttt{GR16} с помощью
+\texttt{od -An -tc -j} и самостоятельно найденного смещения;
+\texttt{-tc} показывает четыре прочитанных байта как символы.
+
+\paragraph{85--90 минут: устный разбор.}
+Объясните цепочку «клавиша $\to$ числовая оценка в RAM $\to$
+символы и атрибут VGA $\to$ секторный буфер RAM $\to$ HDD».
+Чем отличаются \texttt{1000:0000}, \texttt{B800:...} и
+\texttt{1000:sector}? Результат каждого действия проверяйте
+своими наблюдениями, а не ответом автоматического теста.
+
+\subsection*{Самостоятельная работа: 180 минут}
+\paragraph{35 минут: размеры и байты в C/GDB.}
+В рабочем каталоге выполните:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+gcc -std=c11 -Wall -Wextra -Werror -g -O0 \
+  ../../demos/seminar04/memory.c -o memory
+./memory
+gdb -q ./memory
+\end{lstlisting}
+Флаг \texttt{-std=c11} задаёт стандарт языка;
+\texttt{-Wall -Wextra -Werror} включает диагностику;
+\texttt{-g} добавляет сведения для GDB, \texttt{-O0} отключает
+оптимизации, \texttt{-o memory} задаёт имя файла,
+\texttt{-q} выключает заставку GDB. \emph{Вручную} введите
+\texttt{break show\_memory}, \texttt{run},
+\texttt{print sizeof(char)}, \texttt{print sizeof(int)},
+\texttt{print sizeof(long)}, \texttt{print *x},
+\texttt{x/4xb x}, \texttt{x/3dw numbers}, затем
+\texttt{continue} и \texttt{quit}. В команде \texttt{x/4xb}
+число 4 задаёт количество, \texttt{x} --- hex, \texttt{b} --- байт;
+\texttt{x/3dw} читает три 32-битных слова в десятичном виде.
+Сравните размеры типов, шаги между элементами массивов и байты
+\texttt{0x12345678}. Виртуальные адреса Linux и физическая память
+журнала --- разные адресные пространства.
+
+\paragraph{35 минут: цвета и адреса.}
+Вычислите атрибуты «ярко-зелёный на чёрном» и «белый на красном»,
+потом \texttt{BX}, смещение и физические адреса для ещё двух
+свободных позиций текстового экрана. Укажите системы счисления.
+
+\paragraph{30 минут: ввод и арифметика.}
+Переведите скан-коды Q/E в hex; рассчитайте средние $12,0$ и
+$12,1,1$. Объясните различие между числом 12 в массиве и его
+двумя символами VGA. Почему после смены максимума надо менять
+проверку сохранённого значения, но не делитель в \texttt{vga\_two}?
+
+\paragraph{45 минут: диск и повреждение копии.}
+Запишите смещения \texttt{GR16}, оценок и checksum относительно
+начала рассчитанного сектора. После сохранения скопируйте
+\texttt{grades-lab.img} в новый \texttt{grades-corrupt.img}.
+Для уже сохранённого первого байта оценки 12 измените \emph{в копии}
+ровно этот байт на 1, не пересчитывая сумму:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+cp -n grades-lab.img grades-corrupt.img
+printf '\001' | dd of=grades-corrupt.img bs=1 \
+  seek="$((OFFSET + 8))" conv=notrunc
+\end{lstlisting}
+Предварительно положите в \texttt{OFFSET} найденное байтовое
+смещение начала сектора. \texttt{printf '\textbackslash001'} выдаёт
+один байт, \texttt{bs=1} задаёт единицу смещения,
+\texttt{seek=} выбирает первый байт оценок, \texttt{conv=notrunc}
+оставляет остальное неизменным. Запустите журнал с повреждённой
+копией вместо целой, наблюдайте \texttt{BAD\_CHECKSUM}.
+Измените оценку в RAM и повторите загрузку клавишей E:
+плохой сектор не должен заменить текущие данные. При повторном опыте
+возьмите \emph{новое} имя копии.
+
+\paragraph{35 минут: отчёт с собственными проверками.}
+Представьте изменённый \texttt{journal.asm}, результат
+\texttt{diff -u} с эталоном этапа 6 и для каждого изменения
+следующую запись: место в коде, собственный расчёт (основание и
+единицы), старая/новая константы, выполненные команды, ожидаемое,
+наблюдаемое по экрану/COM1/образу и объяснение результата.
+Отдельно покажите, что сохранение оценок переживает перезапуск,
+а образ повреждался только в копии.
+\endgroup

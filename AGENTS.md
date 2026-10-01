@@ -21,6 +21,14 @@ The materials are written in Russian. Keep the language of course content Russia
   from `tex/lectures/lecture04_*.tex` and the outlines for subsequent sessions.
 - `tex/backmatter/references.tex` contains the bibliography / used literature section.
 - `tex/appendices/appendices.tex` contains appendices and compact reference material.
+- `supplementary/lab-report/` contains a standalone demonstration lab and a
+  fully worked example report; both are included in the additional-materials
+  part of the course through `tex/supplementary/` and built as separate HTML/PDF.
+  Its checked C reference files are internal, not student archive contents.
+- `supplementary/debian-install/README.md` is an additional laboratory handbook
+  adapted from `drafts/linux_install_instruction.md`. It covers Windows x86-64
+  (VirtualBox or UEFI dual boot) and Apple Silicon macOS (UTM with Debian arm64),
+  followed by a common terminal/C exercise. Its checked C reference is internal.
 - `slides/lecture02-original/index.html` is an active alternative presentation
   for lecture 2. It preserves the structure of the lecture that was already
   delivered and is built and published alongside the main presentation.
@@ -33,6 +41,25 @@ The materials are written in Russian. Keep the language of course content Russia
   `demos/lecture04-journal/` contains six 16-bit NASM/BIOS/QEMU checkpoints;
   C in this presentation explains algorithms only.
   `tex/lectures/lecture04_journal.tex` is a supplementary handbook section.
+- Seminar 4 has two alternative student handbooks: the basic C/GCC/GDB factorial
+  lab in `demos/seminar04/factorial/README.md` and the advanced BIOS/QEMU journal
+  lab in `demos/seminar04/README.md`. Students choose one. Docker/Pandoc builds
+  HTML, A4 PDFs and LaTeX fragments from these sources; both appear in the full
+  handbook via `tex/seminars/seminar04.tex`. The checked reference C source is
+  internal and must not be included in student bundles.
+- Every standalone laboratory handbook, including each alternative variant, must
+  state the full submission procedure in the student-facing text. A reference to
+  the main course handbook does not replace those instructions. Require students
+  to send the report to the teacher as PDF or HTML, with sources kept separately
+  for the demonstration.
+- The old seminar 4 presentation and earlier seminar text are archived under
+  `legacy/` and are not build targets.
+- Published `materials/` for lectures and seminars are student-facing archive
+  bundles, not copies of `demos/` or `tex/` directory trees. Keep their layout
+  flat and readable, rename versioned files unambiguously, include a short
+  README explaining each file and archive-root usage, and exclude teacher
+  solutions, internal checks, and generated files. HTML and PDF bundles should
+  contain the same student files and be verified after extraction.
 - `legacy/` contains historical or superseded materials. It is for explicit
   historical comparison only and must not be used as an active source.
 - `Dockerfile` defines the Docker image used for LaTeX builds.
@@ -45,7 +72,12 @@ When sources disagree, use this order:
 
 1. `pud_adaptation_course.tex` for the programme and outcomes of section 2.
 2. The canonical files under `tex/` and the main entry point
-   `adaptation_course.tex` for the handbook text.
+   `adaptation_course.tex` for the handbook text; seminar 4's two shared
+   variants are authored in `demos/seminar04/factorial/README.md` and
+   `demos/seminar04/README.md` and included through `tex/`. The demonstration
+   lab and example report are authored in `supplementary/lab-report/README.md`
+   and `supplementary/lab-report/report.md` and included through `tex/`. The
+   Debian installation lab is authored in `supplementary/debian-install/README.md`.
 3. `slides/lectureNN/index.html` for editable lecture presentations.
 4. `slides/theme/`, `slides/presentations.json`, and `Makefile` for the
    presentation system and build contract.

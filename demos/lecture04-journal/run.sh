@@ -4,9 +4,7 @@ stage="${1:-6}"
 case "$stage" in 1|2|3|4|5|6) ;; *) exit 2 ;; esac
 image="build/lecture04-journal/stage$stage/boot.img"
 disk="build/lecture04-journal/grades.img"
-if [ ! -f "$image" ]; then
-    sh demos/lecture04-journal/build.sh "$stage"
-fi
+sh demos/lecture04-journal/build.sh "$stage"
 if [ ! -f "$disk" ]; then
     python3 -c 'from pathlib import Path; p=Path("build/lecture04-journal/grades.img"); p.parent.mkdir(parents=True, exist_ok=True); p.open("wb").truncate(1024*1024)'
 fi

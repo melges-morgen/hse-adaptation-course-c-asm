@@ -40,20 +40,60 @@ IDE-совместимый диск 1 MiB для оценок. Настояще�
 инициализацию, выбирает дискету согласно порядку загрузки, размещает
 её первый сектор по адресу \texttt{0000:7C00} и передаёт туда управление.
 Его последние два байта имеют сигнатуру \texttt{55 AA}; сама программа
-слишком велика для сектора 512 байтов. Поэтому наш загрузочный сектор
-\texttt{boot16.asm} читает сектора 2--18 той же дорожки в RAM через
-BIOS \texttt{INT 13h}, проверяет результат и делает дальний переход
-к \texttt{1000:0000}:
+слишком велика для сектора 512 байтов. Прежде чем читать загрузочный код,
+разберём его регистры и адреса. Регистр \texttt{AX} состоит из двух
+8-битных половин: \texttt{AH} (старший байт) и \texttt{AL} (младший байт).
+\texttt{mov ax, 0x1000} помещает число в \texttt{AX}; команда
+\texttt{mov es, ax} копирует его в отдельный регистр \texttt{ES}.
+Если позднее поменять \texttt{AH} или \texttt{AL}, значение \texttt{ES}
+не изменится. В NASM значение слева от запятой получает результат,
+\texttt{0x} обозначает шестнадцатеричную запись, \texttt{;} начинает
+комментарий, \texttt{имя:} обозначает метку, а квадратные скобки
+\texttt{[...]} означают обращение к памяти. Директивы \texttt{bits},
+\texttt{org}, \texttt{db}, \texttt{dw} и \texttt{times} работают при
+сборке, а не исполняются CPU.
+
+В real mode пара \emph{сегмент:смещение} обозначает физический адрес
+$16\cdot\text{сегмент}+\text{смещение}$ (числа здесь шестнадцатеричные):
+\texttt{1000:0000} $\to$ \texttt{0x10000}. При чтении секторов BIOS
+получает адрес \emph{буфера назначения} в \texttt{ES:BX}; после чтения
+\texttt{CS:IP} будет выбирать там инструкции. Дисковый номер сектора
+и байтовый адрес RAM --- разные адреса:
+\begin{center}\small
+\begin{tabular}{|l|l|}\hline
+Дискета (512 байтов на сектор) & Куда сектор попадает в RAM \\ \hline
+Сектор 1: загрузчик & \texttt{0x07C00--0x07DFF} \\
+Сектор 2: начало журнала & \texttt{0x10000--0x101FF} \\
+Сектор 3: продолжение & \texttt{0x10200--0x103FF} \\
+Сектор 18: конец загрузки & \texttt{0x12000--0x121FF} \\ \hline
+\end{tabular}\end{center}
+Итого 17 секторов занимают $17\cdot512=8704$ байта. Начало буфера
+задаёт пара \texttt{ES:BX=1000:0000}. Этот буфер с кодом не следует путать
+с секторным буфером оценок для отдельного HDD в версии 6.
+
+Загрузочный сектор \texttt{boot16.asm} заполняет регистры для BIOS:
+\texttt{AH=02h} означает чтение, \texttt{AL=11h} --- 17 секторов,
+\texttt{CH=00h} --- цилиндр 0, \texttt{CL=02h} --- начальный сектор 2,
+\texttt{DH=00h} --- головка 0, а \texttt{DL} содержит полученный от BIOS
+номер загрузочной дискеты (\texttt{00h} в нашей конфигурации).
+\texttt{ES:BX=1000:0000} задаёт место для прочитанных байтов.
+Инструкция \texttt{INT 13h} заставляет CPU сохранить на стеке флаги
+и адрес продолжения, взять адрес обработчика из таблицы векторов IVT
+(для \texttt{13h} с физического \texttt{0x004C}) и исполнить код BIOS.
+BIOS переносит данные с дискеты в RAM и возвращает управление;
+загрузчик проверяет флаг CF и число прочитанных секторов. Это
+\emph{программный вызов}, а не аппаратный IRQ клавиатуры.
+Ключевые инструкции сокращённого фрагмента:
 \begin{lstlisting}[basicstyle=\ttfamily\small]
-mov ax, 0x1000
-mov es, ax
-xor bx, bx
-mov ah, 0x02
-mov al, 17
-mov cl, 2
-int 0x13
-jc boot_error
-jmp 0x1000:0x0000
+mov ax, 0x1000      ; choose segment 1000h
+mov es, ax          ; ES = RAM buffer segment
+xor bx, bx          ; BX = 0, buffer offset
+mov ah, 0x02        ; BIOS function: read sectors
+mov al, 17          ; read sectors 2..18
+mov cl, 2           ; start at sector 2
+int 0x13            ; transfer control to BIOS
+jc boot_error       ; CF=1: disk read failed
+jmp 0x1000:0x0000  ; run code now in RAM
 \end{lstlisting}
 В полном листинге дополнительно задаются цилиндр, головка и номер
 загрузочной дискеты \texttt{DL}, а также проверяется число прочитанных
@@ -61,8 +101,6 @@ jmp 0x1000:0x0000
 длиннее $17\cdot512=8704$ байтов. \textbf{Наш код запускается без GRUB},
 хотя BIOS сам по себе остаётся частью учебной машины.
 
-Адрес в real mode рассчитывается как $16\cdot\text{segment}+\text{offset}$.
-Например, \texttt{1000:0000} обозначает физический \texttt{0x10000}.
 Инструкции адресует \texttt{CS:IP}; \texttt{DS} указывает данные программы,
 \texttt{SS:SP} --- её стек. В начале основного NASM-кода \texttt{DS=CS},
 \texttt{SS=7000h}, \texttt{SP=F000h}. Глобальные данные и стек поэтому
@@ -71,14 +109,17 @@ jmp 0x1000:0x0000
 
 Чтобы вывести \texttt{S01  grade 07}, сначала используем готовый сервис
 прошивки. В процедуре \texttt{bios\_text} символы читаются из строки
-\texttt{DS:SI} и передаются в BIOS:
+\texttt{DS:SI} и передаются в BIOS. Например, для символа \texttt{'7'}
+\texttt{AL=37h} содержит ASCII-код, \texttt{AH=0Eh} выбирает услугу,
+\texttt{BH=0} задаёт видеостраницу. \texttt{lodsb} сдвигает \texttt{SI}
+после каждого байта; нулевой байт завершает строку и не выводится:
 \begin{lstlisting}[basicstyle=\ttfamily\small]
-lodsb                    ; AL = next character
-test al, al
-jz .done
-mov ah, 0x0e             ; BIOS teletype
-mov bx, 0x0007
-int 0x10
+lodsb                    ; read DS:SI to AL, advance SI
+test al, al              ; check whether AL is zero
+jz .done                 ; zero marks end of string
+mov ah, 0x0e             ; select BIOS teletype service
+mov bx, 0x0007           ; BH=0: video page, BL=07h
+int 0x10                 ; output AL via BIOS
 \end{lstlisting}
 \texttt{INT 10h} --- \emph{программная} инструкция обращения к BIOS;
 это не аппаратное уведомление о событии. Цифра на экране --- ASCII-символ
@@ -99,24 +140,32 @@ uint8_t grade[16][4]; /* algorithm only */
 \end{lstlisting}
 Учебное значение \texttt{grade[1][2]} имеет смещение 6, но полный адрес
 определяется сегментом \texttt{DS} и реальным размещением метки
-\texttt{grades}. Адрес, байт значения и вывод на экран --- три разные вещи.
+\texttt{grades}. Переменные \texttt{student} и \texttt{work} занимают
+другие байты и не входят в 64 оценки. Адрес, байт значения и вывод
+на экран --- три разные вещи.
 
 После знакомства с VGA текстовый вывод делаем самостоятельно: буфер
 устройства начинается с физического \texttt{0xB8000}, то есть \texttt{B800:0000}.
 На одну позицию приходятся код символа и байт атрибута. Строка экрана имеет
 $80\cdot2=160$ байтов; адрес позиции внутри видеосегмента равен
 $160\cdot\text{row}+2\cdot\text{col}$.
+При чтении символа \texttt{'7'} имеем \texttt{AL=37h}; после задания
+атрибута \texttt{AH=0Fh} слово \texttt{AX=0F37h} записывается как два
+байта \texttt{37 0F} по \texttt{ES:DI} и \texttt{ES:DI+1}.
 \begin{lstlisting}[basicstyle=\ttfamily\small]
-mov ax, 0xb800
-mov es, ax
+mov ax, 0xb800           ; VGA segment
+mov es, ax               ; ES points to video memory
 ; DI already contains the cell offset
-lodsb                    ; AL = character at DS:SI
-mov ah, 0x0f             ; color attribute
-stosw                    ; AX -> ES:DI
+lodsb                    ; read character at DS:SI
+mov ah, 0x0f             ; set color attribute
+stosw                    ; write AX to ES:DI, DI += 2
 \end{lstlisting}
 Это ключевые строки реальной функции \texttt{vga\_text}.
 Процедура \texttt{redraw} перебирает оценки в RAM и создаёт
 \emph{отображение} в VGA; дисплей не становится долговременным хранилищем.
+Оценка 7 лежит одним байтом \texttt{07h}, но для вывода \texttt{07}
+нужны ASCII-байты \texttt{30h} и \texttt{37h}. Если оценка равна
+\texttt{FFh}, показываем два дефиса.
 Для современной видеокарты потребовались бы иные драйверы и, возможно,
 отдельная VRAM.
 
@@ -124,14 +173,17 @@ stosw                    ; AX -> ES:DI
 Через BIOS \texttt{INT 16h} сначала спрашиваем о готовом событии
 (\texttt{AH=01h}), затем читаем его (\texttt{AH=00h}):
 \begin{lstlisting}[basicstyle=\ttfamily\small]
-mov ah, 0x01
-int 0x16
-jz .loop
-xor ah, ah
-int 0x16
-mov al, ah              ; AL = scan code for handle_scan
-call handle_scan
+mov ah, 0x01            ; BIOS: check for a key
+int 0x16                ; call BIOS keyboard service
+jz .loop                ; ZF=1: no key, try again
+xor ah, ah              ; AH=0: read key function
+int 0x16                ; get scan code in AH
+mov al, ah              ; pass scan code in AL
+call handle_scan        ; process the key
 \end{lstlisting}
+После проверки \texttt{AH=01h} флаг ZF сообщает, есть ли клавиша.
+Чтение \texttt{AH=00h} возвращает скан-код в \texttt{AH} и символ
+в \texttt{AL}; для дальнейшего разбора копируем именно скан-код.
 PS/2-контроллер сообщает BIOS о клавише; BIOS предоставляет программе
 высокоуровневый сервис. Клавиша \texttt{A} даёт оценку 10, цифры 0--9
 задают соответствующее значение, Backspace записывает \texttt{FF},
@@ -149,29 +201,36 @@ PS/2-контроллер сообщает BIOS о клавише; BIOS пред
 \texttt{0000:0000}. Четыре байта по смещению $9\cdot4=36$ задают IP и CS
 обработчика IRQ1 в совместимом PIC. При изменении IVT прерывания временно
 выключаем через \texttt{cli}, затем включаем через \texttt{sti}.
+Адреса \texttt{0000:0024--0000:0025} хранят смещение обработчика
+\texttt{irq1}, а \texttt{0000:0026--0000:0027} --- сегмент кода \texttt{CS}.
+При IRQ процессор сохраняет флаги, CS и IP на стеке; обработчик
+дополнительно сохраняет используемые \texttt{AX}, \texttt{BX} и \texttt{DS}.
 После сохранения регистров короткий обработчик считывает скан-код
 из порта \texttt{60h}, кладёт его в кольцевую очередь и подтверждает
 PIC (EOI); возврат выполняет \texttt{iret}. Упрощённая схема кода:
 \begin{lstlisting}[basicstyle=\ttfamily\small]
-irq1:
-    push ax
-    push ds
-    mov ax, cs
-    mov ds, ax
-    in al, 0x60
+irq1:                   ; IRQ1 handler label
+    push ax             ; save AX on the stack
+    push ds             ; save data segment
+    mov ax, cs          ; take our code segment
+    mov ds, ax          ; point DS to our data
+    in al, 0x60         ; read the keyboard byte
     ; enqueue the byte when there is room
-    mov al, 0x20
-    out 0x20, al
-    pop ds
-    pop ax
-    iret
+    mov al, 0x20        ; PIC end-of-interrupt code
+    out 0x20, al        ; acknowledge the PIC
+    pop ds              ; restore DS
+    pop ax              ; restore AX
+    iret                ; restore flags and return
 \end{lstlisting}
 Реальный исходник также проверяет бит готовности, сохраняет \texttt{BX}
 и содержит полный код очереди. Обработчик не перерисовывает экран:
 основной цикл вызывает \texttt{dequeue}, затем \texttt{handle\_scan}.
 Буфер из 64 байтов хранит не более 63 событий, потому что одна позиция
 разделяет состояния «пусто» и «полно». Основной цикл всё ещё опрашивает
-\emph{очередь}, но не PS/2-порт. Внешний IRQ1, намеренное \texttt{INT 16h}
+\emph{очередь}, но не PS/2-порт. Обработчик продвигает \texttt{qhead},
+а цикл --- \texttt{qtail}; \texttt{dequeue} возвращает событие в
+\texttt{AL} с \texttt{CF=0} или выставляет \texttt{CF=1}, если очередь пуста.
+Внешний IRQ1, намеренное \texttt{INT 16h}
 и исключение от CPU имеют разные причины, хотя используют механизм
 передачи управления.
 
@@ -184,20 +243,29 @@ irq1:
 Например, 0 и 10 дают 5.00; 0, 1 и 1 дают 0.67. Такое целочисленное
 вычисление не требует библиотеки float. В NASM четыре поля читаются
 из \texttt{DS:grades+BX}, байт \texttt{FF} пропускается, число 0
-учитывается. Цикл из диагностики COM1:
+учитывается. \texttt{BX} начинает с $4\cdot\texttt{student}$ и увеличивается
+после каждого байта, \texttt{CX} считает четыре шага цикла, \texttt{DH}
+хранит сумму, \texttt{DL} --- количество. Например, для
+\texttt{00 0A FF FF} получаем сумму 10 и количество 2.
+Цикл из диагностики COM1:
 \begin{lstlisting}[basicstyle=\ttfamily\small]
-mov cx, WORKS
+mov cx, WORKS           ; loop over four grades
 xor dx, dx             ; DH=sum, DL=count
 .sum:
-    mov al, [grades+bx]
-    cmp al, UNSET
-    je .skip
-    inc dl
-    add dh, al
+    mov al, [grades+bx] ; read one grade from RAM
+    cmp al, UNSET       ; compare with sentinel FF
+    je .skip            ; skip unset grade
+    inc dl              ; increment count
+    add dh, al          ; add grade to sum
 .skip:
-    inc bx
-    loop .sum
+    inc bx              ; move to next grade
+    loop .sum           ; decrement CX, repeat if nonzero
 \end{lstlisting}
+Для примера \texttt{00 01 01 FF} сумма равна 2, количество --- 3.
+Перед умножением сохраняем количество из \texttt{DL} в RAM, так как
+\texttt{mul} изменяет регистр \texttt{DX}. Получаем числитель
+$2\cdot100+\lfloor3/2\rfloor=201$; после деления на 3 в
+\texttt{AX} находятся 67 сотых, то есть 0.67.
 Регистры держат текущую сумму; \texttt{CS:IP} выбирает байты машинных
 инструкций, а \texttt{DS:grades+BX} --- байты данных. В строгой гарвардской
 машине эти адресные пространства были бы разделены, в выбранном x86 PC
@@ -220,6 +288,13 @@ RAM энергозависима, поэтому оценки пишутся в 
 с расширенным адресным пакетом DAP предоставляет чтение \texttt{AH=42h}
 и запись \texttt{AH=43h}; флаг CF сообщает об ошибке. DAP задаёт
 число секторов, физический адрес буфера \texttt{1000:sector} и номер LBA.
+Пара \texttt{DS:SI=1000:dap} указывает на сам 16-байтовый пакет:
+байты 0--1 содержат его размер и резерв, 2--3 --- количество секторов,
+4--7 --- смещение и сегмент \emph{другого} буфера \texttt{sector},
+8--15 --- номер LBA. Для записи оценок сначала зануляем этот 512-байтовый
+буфер в RAM, затем заполняем поля и контрольную сумму; лишь после
+\texttt{INT 13h} сектор LBA 1 отдельного HDD может измениться. При
+ошибке CF=1 показываем \texttt{NO\_DISK}, а не \texttt{SAVED}.
 Здесь нет файловой системы: сектор не имеет имени файла. Как именно
 BIOS взаимодействует с контроллером, этот вызов скрывает; при прямом
 PIO CPU переносил бы слова сам, а при DMA контроллер передавал бы блок
@@ -267,7 +342,21 @@ PIO CPU переносил бы слова сам, а при DMA контрол�
 Что после перезапуска остаётся на дискете, а что на отдельном HDD?
 Почему версия без гостевой ОС всё же может вызвать BIOS \texttt{INT 13h}?
 
-Исходники действующего журнала: \path{demos/lecture04-journal/}.
+Исходники журнала находятся в каталоге
+\path{demos/lecture04-journal/}. Загрузчик \texttt{boot16.asm} общий.
+Каждый этап $N=1,\ldots,6$ имеет отдельный файл
+\texttt{stages/stageN/journal.asm}.
+В каждом файле только возможности соответствующей версии, без условной
+компиляции по номеру этапа. Чтобы увидеть, как BIOS-ввод сменяется
+собственным обработчиком IRQ1, из каталога
+\path{demos/lecture04-journal/} выполните:
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+diff -u stages/stage3/journal.asm \
+        stages/stage4/journal.asm
+\end{lstlisting}
+Аналогично сравните соседние файлы 1--2, 2--3, 4--5 и 5--6.
+Код возврата 1 у \texttt{diff} означает найденные различия.
+
 Команда \texttt{make lecture4-journal-check} собирает шесть образов в Docker
 и проверяет их запуск в QEMU; \texttt{make lecture4-journal-run}
 показывает последнюю версию в браузере через noVNC по адресу

@@ -1,6 +1,7 @@
 """QEMU integration: real-mode BIOS boot, keyboard, IRQ and disk persistence."""
 from pathlib import Path
 import os
+import re
 import selectors
 import socket
 import subprocess
@@ -9,14 +10,37 @@ import time
 
 
 ROOT = Path("build/lecture04-journal")
+SOURCES = Path("demos/lecture04-journal/stages")
+
+
+def verify_stage_sources():
+    previous = None
+    additions = {1: "bios_text:", 2: "vga_text:", 3: "handle_scan:",
+                 4: "irq1:", 5: "mov [current_count], dh", 6: "disk_io:"}
+    for stage in range(1, 7):
+        path = SOURCES / f"stage{stage}/journal.asm"
+        assert path.is_file(), f"Missing standalone stage: {path}"
+        text = path.read_text(encoding="utf-8")
+        assert "%if STAGE" not in text and "-DSTAGE" not in text
+        assert "include" not in text.lower(), f"Stage must be readable on its own: {path}"
+        assert additions[stage] in text, f"Missing stage {stage} feature"
+        for future in range(stage + 1, 7):
+            assert additions[future] not in text, f"Stage {stage} contains stage {future} code"
+        assert f"mov al, '{stage}'" in text, f"Incorrect COM1 stage number: {stage}"
+        if previous is not None:
+            assert text != previous, f"Stage {stage} duplicates previous source"
+        previous = text
+    script = Path("demos/lecture04-journal/build.sh").read_text()
+    assert "stages/stage$stage/journal.asm" in script
+    assert "-DSTAGE" not in script
 
 
 class Machine:
-    def __init__(self, stage, path, disk=None):
+    def __init__(self, stage, path, disk=None, image_root=ROOT):
         path.unlink(missing_ok=True)
         command = [
             "qemu-system-i386", "-machine", "pc", "-m", "16M",
-            "-drive", f"file={ROOT / f'stage{stage}/boot.img'},format=raw,if=floppy",
+            "-drive", f"file={image_root / f'stage{stage}/boot.img'},format=raw,if=floppy",
             "-boot", "order=a",
             "-display", "none", "-serial", "stdio", "-no-reboot",
             "-monitor", f"unix:{path},server=on,wait=off",
@@ -64,6 +88,30 @@ class Machine:
         self.monitor.sendall(f"sendkey {name}\n".encode())
         self.expect(expected)
 
+    def vga_text(self, address, count):
+        return self.vga_bytes(address, count)[::2].decode("ascii")
+
+    def vga_bytes(self, address, count):
+        self.monitor.settimeout(.1)
+        try:
+            while self.monitor.recv(4096):
+                pass
+        except socket.timeout:
+            pass
+        self.monitor.sendall(f"xp /{count * 2}bx 0x{address:x}\n".encode())
+        output = b""
+        deadline = time.monotonic() + 3
+        while time.monotonic() < deadline and b"(qemu)" not in output:
+            try:
+                output += self.monitor.recv(4096)
+            except socket.timeout:
+                continue
+        rows = re.findall(rb"(?m)^[0-9a-fA-F]{8,16}: (.*)$", output)
+        values = [int(value, 16) for row in rows
+                  for value in re.findall(rb"0x([0-9a-fA-F]{2})\b", row)]
+        assert len(values) == count * 2, f"Cannot read VGA at {address:#x}: {output!r}"
+        return bytes(values)
+
     def ignored(self, name):
         self.monitor.sendall(f"sendkey {name}\n".encode())
         time.sleep(.15)
@@ -90,6 +138,7 @@ def boot(stage, tmp, disk=None):
 
 
 def run():
+    verify_stage_sources()
     with tempfile.TemporaryDirectory(dir=ROOT) as location:
         tmp = Path(location)
         disk = tmp / "grades.img"
@@ -99,6 +148,10 @@ def run():
         for stage in (1, 2, 3, 4, 5):
             m = boot(stage, tmp)
             try:
+                if stage == 1:
+                    assert m.vga_text(0xb8000, 3) == "S01"
+                if stage == 2:
+                    assert m.vga_text(0xb8002, 13) == "COURSE GRADES"
                 if stage >= 3:
                     m.key("0", "GRADE S1 W1=0")
                     m.key("a", "GRADE S1 W1=10")
