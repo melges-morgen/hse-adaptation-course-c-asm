@@ -22,6 +22,8 @@ def normalized(text):
 
 
 root = Path(sys.argv[1] if len(sys.argv) > 1 else "build")
+source = Path("supplementary/debian-install/README.md").read_text(encoding="utf-8")
+assert "чернов" not in source.casefold(), "Student guide still mentions the draft"
 html = (root / "html/debian-install/index.html").read_text(encoding="utf-8")
 assert 'lang="ru"' in html, "HTML language declaration missing"
 parser = VisibleText()
@@ -33,6 +35,7 @@ editions = (normalized(" ".join(parser.parts)), pdf_text(pdf), pdf_text(course_p
 for marker in (
     "Установка Debian и знакомство с терминалом", "VirtualBox", "UTM",
     "Windows x86-64", "Mac с Apple Silicon", "Debian второй системой",
+    "Mac Apple Silicon: Debian второй системой",
     "Плюсы", "Минусы", "Hello from C!", "PDF или HTML",
 ):
     assert all(marker.casefold() in edition.casefold() for edition in editions), f"Missing {marker!r} in an edition"

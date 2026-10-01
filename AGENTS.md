@@ -25,10 +25,11 @@ The materials are written in Russian. Keep the language of course content Russia
   fully worked example report; both are included in the additional-materials
   part of the course through `tex/supplementary/` and built as separate HTML/PDF.
   Its checked C reference files are internal, not student archive contents.
-- `supplementary/debian-install/README.md` is an additional laboratory handbook
-  adapted from `drafts/linux_install_instruction.md`. It covers Windows x86-64
-  (VirtualBox or UEFI dual boot) and Apple Silicon macOS (UTM with Debian arm64),
-  followed by a common terminal/C exercise. Its checked C reference is internal.
+- `supplementary/debian-install/README.md` is an additional laboratory handbook.
+  It covers Windows x86-64 (VirtualBox or UEFI dual boot) and Apple Silicon
+  macOS (UTM with Debian arm64, or a model-supported native installation through
+  the Debian Bananas installer), followed by a common terminal/C exercise.
+  Its checked C reference is internal.
 - `slides/lecture02-original/index.html` is an active alternative presentation
   for lecture 2. It preserves the structure of the lecture that was already
   delivered and is built and published alongside the main presentation.

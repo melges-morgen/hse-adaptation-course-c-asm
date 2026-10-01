@@ -407,10 +407,11 @@ nasm -f bin hello.asm -o hello.bin
 
 ### Debian: установка и первое знакомство с терминалом
 
-[Дополнительная лабораторная](supplementary/debian-install/README.md) основана
-на черновике `drafts/linux_install_instruction.md` и предлагает выбрать один
+[Дополнительная лабораторная](supplementary/debian-install/README.md) предлагает выбрать один
 маршрут: VirtualBox с Debian amd64 в Windows x86-64; установка Debian второй
-системой на Windows x86-64 с UEFI; либо UTM с Debian arm64 на Mac Apple Silicon.
+системой на Windows x86-64 с UEFI; UTM с Debian arm64 на Mac Apple Silicon;
+либо установка Debian рядом с macOS через установщик команды Debian Bananas
+после проверки поддержки конкретной модели.
 После установки во всех маршрутах создают рабочий каталог, ставят инструменты,
 пишут и запускают `hello.c`. Проверяемый исходник в `reference/` не входит в
 студенческую публикацию. Отчёт отправляют преподавателю в PDF или HTML,
