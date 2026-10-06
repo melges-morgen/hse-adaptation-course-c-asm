@@ -34,7 +34,7 @@ for html_name, pdf_name, markers in (
                                              "Иванов Иван", "Сумма: 2", "Сумма: 12")),
 ):
     html = (root / "html/lab-report" / html_name).read_text(encoding="utf-8")
-    assert 'lang="ru"' in html, html_name
+    assert re.search(r"lang=['\"]ru['\"]", html), html_name
     parser = VisibleText()
     parser.feed(html)
     pdf = root / "pdf/lab-report" / pdf_name
@@ -52,7 +52,7 @@ assert course.index("Демонстрационная лабораторная: 
 
 log = (root / "latex/adaptation_course.log").read_text(encoding="utf-8", errors="replace")
 assert "multiply defined" not in log and "duplicate ignored" not in log, "Duplicate section anchor in course PDF"
-fragment = log.split("(./build/latex/lab_report_body.tex", 1)[1].split(
+fragment = log.split("(./tex/supplementary/lab_report_body.tex", 1)[1].split(
     "(./tex/backmatter/references.tex", 1
 )[0]
 assert "Overfull \\hbox" not in fragment, "Demo/report fragment contains overfull text"

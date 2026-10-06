@@ -32,7 +32,7 @@ html_path = root / "html/seminar04/index.html"
 pdf_path = root / "pdf/seminar04/seminar04.pdf"
 course_path = root / "pdf/adaptation_course.pdf"
 html = html_path.read_text(encoding="utf-8")
-assert 'lang="ru"' in html and "reveal.js" not in html.lower(), "Expected a readable Russian handbook"
+assert re.search(r"lang=['\"]ru['\"]", html) and "reveal.js" not in html.lower(), "Expected a readable Russian handbook"
 parser = VisibleText()
 parser.feed(html)
 editions = (normalized(" ".join(parser.parts)), pdf_text(pdf_path), pdf_text(course_path))
@@ -57,7 +57,7 @@ basic_html = root / "html/seminar04/factorial/index.html"
 basic_pdf = root / "pdf/seminar04/seminar04-factorial.pdf"
 basic_parser = VisibleText()
 html = basic_html.read_text(encoding="utf-8")
-assert 'lang="ru"' in html
+assert re.search(r"lang=['\"]ru['\"]", html)
 basic_parser.feed(html)
 basic_editions = (normalized(" ".join(basic_parser.parts)), pdf_text(basic_pdf), editions[2])
 for marker in ("вариант 1 (базовый)", "Напишите первую версию в nano", "Найдите ошибку в GDB"):
@@ -129,8 +129,8 @@ with tempfile.TemporaryDirectory(prefix="seminar04-extract-") as temporary:
                 assert (extracted / file).read_bytes() == (source / file).read_bytes()
 log = (root / "latex/adaptation_course.log").read_text(encoding="utf-8", errors="replace")
 assert "multiply defined" not in log and "duplicate ignored" not in log, "Duplicate labels in course PDF"
-basic_log = log.split("(./build/latex/seminar04_factorial_body.tex", 1)[1].split(
-    "(./build/latex/seminar04_body.tex", 1
+basic_log = log.split("(./tex/seminars/seminar04_factorial_body.tex", 1)[1].split(
+    "(./tex/seminars/seminar04_body.tex", 1
 )[0]
 assert "Overfull \\hbox" not in basic_log, "Factorial variant has overfull lines in course PDF"
 print("seminar04: both variants appear in HTML, A4 PDFs and course PDF; student bundles match — OK")

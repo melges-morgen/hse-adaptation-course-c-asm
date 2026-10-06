@@ -25,7 +25,7 @@ The materials are written in Russian. Keep the language of course content Russia
   fully worked example report; both are included in the additional-materials
   part of the course through `tex/supplementary/` and built as separate HTML/PDF.
   Its checked C reference files are internal, not student archive contents.
-- `supplementary/debian-install/README.md` is an additional laboratory handbook.
+- `tex/supplementary/debian_install_body.tex` is an additional laboratory handbook.
   It covers Windows x86-64 (VirtualBox or UEFI dual boot) and Apple Silicon
   macOS (UTM with Debian arm64, or a model-supported native installation through
   the Debian Bananas installer), followed by a common terminal/C exercise.
@@ -43,9 +43,9 @@ The materials are written in Russian. Keep the language of course content Russia
   C in this presentation explains algorithms only.
   `tex/lectures/lecture04_journal.tex` is a supplementary handbook section.
 - Seminar 4 has two alternative student handbooks: the basic C/GCC/GDB factorial
-  lab in `demos/seminar04/factorial/README.md` and the advanced BIOS/QEMU journal
-  lab in `demos/seminar04/README.md`. Students choose one. Docker/Pandoc builds
-  HTML, A4 PDFs and LaTeX fragments from these sources; both appear in the full
+  lab in `tex/seminars/seminar04_factorial_body.tex` and the advanced BIOS/QEMU journal
+  lab in `tex/seminars/seminar04_body.tex`. Students choose one. Docker/TeX4ht and
+  XeLaTeX build HTML and A4 PDFs from these TeX sources; both appear in the full
   handbook via `tex/seminars/seminar04.tex`. The checked reference C source is
   internal and must not be included in student bundles.
 - Every standalone laboratory handbook, including each alternative variant, must
@@ -74,11 +74,13 @@ When sources disagree, use this order:
 1. `pud_adaptation_course.tex` for the programme and outcomes of section 2.
 2. The canonical files under `tex/` and the main entry point
    `adaptation_course.tex` for the handbook text; seminar 4's two shared
-   variants are authored in `demos/seminar04/factorial/README.md` and
-   `demos/seminar04/README.md` and included through `tex/`. The demonstration
-   lab and example report are authored in `supplementary/lab-report/README.md`
-   and `supplementary/lab-report/report.md` and included through `tex/`. The
-   Debian installation lab is authored in `supplementary/debian-install/README.md`.
+   variants are authored in `tex/seminars/seminar04_factorial_body.tex` and
+   `tex/seminars/seminar04_body.tex`. The demonstration lab and example report
+   are authored in `tex/supplementary/lab_report_body.tex` and
+   `tex/supplementary/lab_report_example_body.tex`. The Debian and Ubuntu guides
+   are authored in `tex/supplementary/debian_install_body.tex` and
+   `tex/supplementary/ubuntu_terminal_body.tex`. Teacher-only seminar guidance
+   and oral-defense prompts live under `tex/teacher/`.
 3. `slides/lectureNN/index.html` for editable lecture presentations.
 4. `slides/theme/`, `slides/presentations.json`, and `Makefile` for the
    presentation system and build contract.

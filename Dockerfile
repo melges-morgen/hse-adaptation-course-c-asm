@@ -11,7 +11,7 @@ RUN apt-get update \
         texlive-fonts-recommended \
         texlive-lang-cyrillic \
         texlive-xetex \
-        pandoc \
+        texlive-extra-utils \
         python3 \
         poppler-utils \
         lmodern \

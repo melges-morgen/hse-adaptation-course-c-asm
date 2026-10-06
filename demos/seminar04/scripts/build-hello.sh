@@ -3,7 +3,7 @@ set -eu
 out="${SEMINAR4_WORK:-work/seminar04}"
 mkdir -p "$out"
 source="${SEMINAR4_HELLO_SOURCE:-$out/hello.asm}"
-test -f "$source" || { printf '%s\n' 'Скопируйте hello.asm в рабочий каталог; команды приведены в demos/seminar04/README.md' >&2; exit 2; }
+test -f "$source" || { printf '%s\n' 'Скопируйте hello.asm в рабочий каталог; команды приведены в методичке семинара №4 (build/html/seminar04/index.html)' >&2; exit 2; }
 nasm -f bin "$source" -o "$out/hello.bin"
 python3 -c '
 from pathlib import Path

@@ -1,0 +1,36 @@
+% Общая верстка двух студенческих бланков; компиляция из корня репозитория.
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{geometry}
+\usepackage{array}
+\geometry{left=18mm,right=18mm,top=16mm,bottom=17mm}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\newcommand{\question}[5]{%
+  \item \textbf{#1}\par\smallskip
+  {\small\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.47\linewidth}@{\hspace{3mm}}>{\raggedright\arraybackslash}p{.47\linewidth}@{}}
+    А) #2 & Б) #3 \\[1mm]
+    В) #4 & Г) #5
+  \end{tabular}\par}}
+\newcommand{\quizheader}[1]{%
+  {\Large\bfseries Тест по лекции и лабораторной работе № 4}\par\smallskip
+  \textbf{Вариант лабораторной: #1}\par\medskip
+  ФИО: \underline{\hspace{95mm}}\quad Группа: \underline{\hspace{29mm}}\par\medskip
+  5 минут. Выберите \textbf{один} ответ в каждом вопросе и впишите его букву
+  в таблицу на второй странице. Каждый верный ответ — 1 балл из 10.\par\medskip}
+\newcommand{\quiznamedheader}[4]{%
+  {\Large\bfseries Тест по лекции и лабораторной работе № 4}\par\smallskip
+  \textbf{ФИО:} #1\par
+  \textbf{Подгруппа:} #2\par
+  \textbf{Лабораторная:} #3\par
+  \textbf{Код бланка:} \texttt{#4}\par\medskip
+  5 минут. Выберите \textbf{один} ответ в каждом вопросе и впишите его букву
+  в таблицу на второй странице. Каждый верный ответ — 1 балл из 10.\par\medskip}
+\newcommand{\answergrid}{%
+  \medskip\textbf{Ответы (по одной букве в каждой клетке):}\par\smallskip
+  \begin{tabular}{|*{10}{c|}}\hline
+    1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\ \hline
+    \rule{0pt}{8mm}\hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} & \hspace{9mm} \\ \hline
+  \end{tabular}\par\medskip
+  Балл: \underline{\hspace{12mm}} / 10}

@@ -1,0 +1,226 @@
+Эта дополнительная методичка рассчитана на компьютер, где \textbf{Ubuntu
+уже установлена рядом с Windows} и при включении доступен загрузчик GRUB
+2. Устанавливать Ubuntu, менять разделы диска или настройки загрузчика
+здесь не требуется. После входа в Ubuntu вы создадите учебную папку,
+напишете текстовый файл и научитесь находить, копировать и перемещать
+файлы. Все примеры выполняйте от имени обычного пользователя.
+
+\hypertarget{ux432ux44bux431ux43eux440-ubuntu-ux432-grub-2}{%
+\section{Выбор Ubuntu в GRUB
+2}\label{ux432ux44bux431ux43eux440-ubuntu-ux432-grub-2}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Сохраните работу в запущенной системе и перезагрузите компьютер. GRUB
+  2 --- это меню выбора операционной системы, которое появляется
+  \textbf{до} запуска Ubuntu или Windows.
+\item
+  Если меню появилось, стрелками выберите пункт \textbf{Ubuntu} (не
+  \textbf{Advanced options for Ubuntu} и не \textbf{Windows Boot
+  Manager}) и нажмите \textbf{Enter}. Названия и оформление могут
+  немного отличаться.
+\item
+  Дождитесь экрана входа Ubuntu, выберите свою учётную запись и введите
+  пароль. При наборе пароля символы могут не отображаться --- это
+  нормально. После входа дождитесь рабочего стола.
+\end{enumerate}
+
+Если меню GRUB 2 не появилось, но сразу загрузилась Ubuntu, переходите к
+следующему разделу: иногда меню скрыто при автоматическом запуске. Если
+запустилась Windows либо в меню нет Ubuntu, остановитесь и уточните у
+преподавателя или администратора, как выбрать установленную систему
+\textbf{на этом компьютере}. Не меняйте разделы диска или параметры
+загрузчика ради выполнения этой инструкции.
+
+\hypertarget{ux43eux442ux43aux440ux44bux432ux430ux435ux43c-ux442ux435ux440ux43cux438ux43dux430ux43b}{%
+\section{Открываем
+терминал}\label{ux43eux442ux43aux440ux44bux432ux430ux435ux43c-ux442ux435ux440ux43cux438ux43dux430ux43b}}
+
+На рабочем столе Ubuntu нажмите \textbf{Ctrl+Alt+T}. Откроется окно
+терминала с приглашением ввести команду. Другой способ: откройте обзор
+приложений, найдите \textbf{Терминал} (\emph{Terminal}) и запустите его.
+Если сочетание клавиш в вашей конфигурации не сработало, используйте
+поиск приложений.
+
+\textbf{Терминал} показывает введённые команды и их результат.
+\textbf{Командная оболочка} (\emph{shell}, часто Bash) читает команду,
+например \texttt{pwd}, и запускает её. В приглашении могут быть имя
+пользователя, имя компьютера и знак \texttt{\$} --- \textbf{сам знак
+\texttt{\$} из примеров вводить не нужно}. Чтобы выполнить набранную
+команду, нажмите \textbf{Enter}. Команда может ничего не напечатать,
+если выполнилась успешно.
+
+\hypertarget{ux433ux434ux435-ux43cux44b-ux43dux430ux445ux43eux434ux438ux43cux441ux44f-ux43aux430ux442ux430ux43bux43eux433ux438-ux438-ux43fux443ux442ux438}{%
+\section{Где мы находимся: каталоги и
+пути}\label{ux433ux434ux435-ux43cux44b-ux43dux430ux445ux43eux434ux438ux43cux441ux44f-ux43aux430ux442ux430ux43bux43eux433ux438-ux438-ux43fux443ux442ux438}}
+
+Введите по очереди:
+
+\begin{verbatim}
+pwd
+ls
+cd ~
+pwd
+\end{verbatim}
+
+\texttt{pwd} показывает \textbf{текущий каталог} (\emph{working
+directory}), а \texttt{ls} --- его содержимое. \texttt{cd} меняет
+текущий каталог. Знак \texttt{\textasciitilde{}} означает ваш
+\textbf{домашний каталог}; результат \texttt{pwd} после
+\texttt{cd\ \textasciitilde{}} будет похож на \texttt{/home/ваше\_имя}.
+Это пример, а не одинаковый для всех путь.
+
+В Linux корень дерева каталогов обозначается \texttt{/}. Путь
+\texttt{/home/ваше\_имя} начинается с \texttt{/} и называется
+\textbf{абсолютным}. Имя \texttt{notes.txt} задаёт путь от текущего
+каталога --- это \textbf{относительный} путь. \texttt{.} означает
+текущий каталог, \texttt{..} --- родительский. Регистр букв важен:
+\texttt{Notes.txt} и \texttt{notes.txt} --- разные имена.
+
+\hypertarget{ux441ux43eux437ux434ux430ux451ux43c-ux443ux447ux435ux431ux43dux44bux439-ux43aux430ux442ux430ux43bux43eux433-ux438-ux444ux430ux439ux43b}{%
+\section{Создаём учебный каталог и
+файл}\label{ux441ux43eux437ux434ux430ux451ux43c-ux443ux447ux435ux431ux43dux44bux439-ux43aux430ux442ux430ux43bux43eux433-ux438-ux444ux430ux439ux43b}}
+
+Начиная из домашнего каталога, выполните:
+
+\begin{verbatim}
+mkdir terminal-practice
+cd terminal-practice
+pwd
+touch notes.txt
+ls
+\end{verbatim}
+
+\texttt{mkdir} создал каталог; \texttt{cd} перешёл в него.
+\texttt{touch} создал пустой файл \texttt{notes.txt} (если файл уже
+существует, команда обновит время его изменения). \texttt{ls} теперь
+должен показать \texttt{notes.txt}. Если \texttt{mkdir} сообщает
+\texttt{File\ exists}, учебная папка уже существует: перейдите в неё
+командой \texttt{cd\ terminal-practice} и проверьте содержимое командой
+\texttt{ls}, прежде чем продолжать.
+
+Сохраните текст в файле через редактор \textbf{nano}:
+
+\begin{verbatim}
+nano notes.txt
+\end{verbatim}
+
+Введите в редакторе две строки, например:
+
+\begin{verbatim}
+Изучаю терминал Ubuntu.
+Мой первый текстовый файл.
+\end{verbatim}
+
+\textbf{Сохраните файл в nano}: нажмите \textbf{Ctrl+O} (буква O), затем
+\textbf{Enter} для подтверждения имени. Нажмите \textbf{Ctrl+X}, чтобы
+выйти. Подсказки внизу nano используют символ \texttt{\^{}} для клавиши
+Ctrl: \texttt{\^{}O} означает Ctrl+O. Если при выходе редактор
+спрашивает о сохранении несохранённых изменений, подтвердите сохранение
+и имя файла.
+
+Убедитесь, что файл содержит ваш текст:
+
+\begin{verbatim}
+cat notes.txt
+\end{verbatim}
+
+\texttt{cat} выводит содержимое небольшого текстового файла в терминал.
+Для длинного файла удобнее \texttt{less\ notes.txt}: прокрутка ---
+стрелками, выход --- клавишей \textbf{q}.
+
+\hypertarget{ux43aux43eux43fux438ux440ux443ux435ux43c-ux43fux435ux440ux435ux438ux43cux435ux43dux43eux432ux44bux432ux430ux435ux43c-ux438-ux443ux434ux430ux43bux44fux435ux43c}{%
+\section{Копируем, переименовываем и
+удаляем}\label{ux43aux43eux43fux438ux440ux443ux435ux43c-ux43fux435ux440ux435ux438ux43cux435ux43dux43eux432ux44bux432ux430ux435ux43c-ux438-ux443ux434ux430ux43bux44fux435ux43c}}
+
+Оставайтесь в \texttt{terminal-practice}. Команды ниже работают только с
+файлами учебного примера:
+
+\begin{verbatim}
+cp notes.txt notes-copy.txt
+ls
+mv notes-copy.txt draft.txt
+mkdir archive
+mv draft.txt archive/
+ls archive
+rm archive/draft.txt
+rmdir archive
+ls
+\end{verbatim}
+
+\texttt{cp} делает копию, \texttt{mv} переименовывает файл или переносит
+его в каталог, \texttt{rm} удаляет файл, а \texttt{rmdir} удаляет
+\textbf{пустой} каталог. В конце \texttt{notes.txt} остаётся на месте.
+Перед \texttt{rm} проверьте путь через \texttt{ls}: обычно удаление из
+терминала не перемещает файл в корзину. Не применяйте эти команды к
+незнакомым каталогам.
+
+Из учебного каталога команда \texttt{cd\ ..} вернёт вас на уровень выше
+--- домой. Команда \texttt{cd\ \textasciitilde{}} вернёт домой из любого
+каталога. Проверяйте результат через \texttt{pwd}.
+
+\hypertarget{ux43aux43eux440ux43eux442ux43aux430ux44f-ux43fux430ux43cux44fux442ux43aux430-ux438-ux43fux43eux43cux43eux449ux44c}{%
+\section{Короткая памятка и
+помощь}\label{ux43aux43eux440ux43eux442ux43aux430ux44f-ux43fux430ux43cux44fux442ux43aux430-ux438-ux43fux43eux43cux43eux449ux44c}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3700}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5900}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Команда
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Что делает
+\end{minipage} \\
+\midrule
+\endhead
+\texttt{pwd}, \texttt{ls}, \texttt{ls\ -a} & Показать текущий каталог,
+его содержимое и скрытые имена. \\
+\texttt{cd\ ..}, \texttt{cd\ \textasciitilde{}} & Перейти на уровень
+выше или домой. \\
+\texttt{mkdir}, \texttt{touch}, \texttt{nano} & Создать каталог, пустой
+файл или отредактировать текст. \\
+\texttt{cat}, \texttt{less} & Вывести текст или просмотреть его
+постранично. \\
+\texttt{cp}, \texttt{mv}, \texttt{rm}, \texttt{rmdir} & Копировать,
+переместить, удалить файл или пустой каталог. \\
+\texttt{grep\ -n\ \textquotesingle{}Ubuntu\textquotesingle{}\ notes.txt}
+& Найти строки со словом \texttt{Ubuntu} и показать их номера. \\
+\texttt{find\ .\ -name\ \textquotesingle{}*.txt\textquotesingle{}} &
+Найти файлы с именем, заканчивающимся на \texttt{.txt}, начиная с
+текущего каталога. \\
+\texttt{wc\ -l\ notes.txt} & Посчитать строки в файле. \\
+\bottomrule
+\end{longtable}
+
+В примере с \texttt{find} кавычки вокруг \texttt{*.txt} нужны, чтобы
+образец имени обрабатывала команда \texttt{find}, а не оболочка заранее.
+Для справки по команде попробуйте \texttt{ls\ -\/-help} или
+\texttt{man\ ls}; из справки \texttt{man} выходят клавишей \textbf{q}.
+Команды вводите без обратных кавычек --- здесь они лишь выделяют текст
+команды.
+
+\hypertarget{ux441ux430ux43cux43eux441ux442ux43eux44fux442ux435ux43bux44cux43dux430ux44f-ux43fux440ux430ux43aux442ux438ux43aux430}{%
+\section{Самостоятельная
+практика}\label{ux441ux430ux43cux43eux441ux442ux43eux44fux442ux435ux43bux44cux43dux430ux44f-ux43fux440ux430ux43aux442ux438ux43aux430}}
+
+Из домашнего каталога создайте каталог \texttt{my-work}, войдите в него,
+создайте файл \texttt{plan.txt} и запишите в нём две собственные строки
+через \texttt{nano}. Проверьте содержимое командой \texttt{cat},
+создайте копию \texttt{plan-copy.txt}, переименуйте её в
+\texttt{backup.txt}, посмотрите список файлов и удалите \textbf{только}
+\texttt{backup.txt}. В результате в \texttt{my-work} должен остаться
+\texttt{plan.txt} с вашим текстом. Для проверки используйте
+\texttt{pwd}, \texttt{ls} и \texttt{cat\ plan.txt}.
+
+Если команда отвечает \texttt{No\ such\ file\ or\ directory}, сначала
+проверьте \texttt{pwd} и \texttt{ls}: возможно, вы находитесь не в той
+папке либо ошиблись в имени (включая регистр). \texttt{cd} не создаёт
+каталог: перед переходом каталог должен существовать. Если команда
+отвечает \texttt{command\ not\ found}, проверьте написание команды,
+пробелы и раскладку клавиатуры; не повторяйте её с \texttt{sudo} наугад.
+Если завис просмотр в \texttt{less} или \texttt{man}, нажмите
+\textbf{q}; если нужно прервать выполняющуюся команду, нажмите
+\textbf{Ctrl+C}.

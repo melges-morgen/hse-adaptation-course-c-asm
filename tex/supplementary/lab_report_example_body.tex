@@ -1,0 +1,138 @@
+\textbf{Это образец заполнения.} Автор, группа и дата ниже вымышлены.
+Свою лабораторную работу оформляйте по наблюдениям на собственном
+компьютере; отправляйте преподавателю отчёт в \textbf{PDF или HTML}, а
+исходные файлы сохраняйте отдельно для защиты.
+
+\textbf{Автор:} Иванов Иван.\\
+\textbf{Группа:} учебная группа ПИ-000.\\
+\textbf{Дата:} 1 октября 2026 года.\\
+\textbf{Тема:} проверка суммы двух чисел и исправление логической
+ошибки.
+
+\hypertarget{ux446ux435ux43bux44c-ux438-ux443ux441ux43bux43eux432ux438ux44f}{%
+\section{Цель и
+условия}\label{ux446ux435ux43bux44c-ux438-ux443ux441ux43bux43eux432ux438ux44f}}
+
+Создать программу на C, вычисляющую сумму двух целых чисел. Перед
+запуском предсказать результат, сравнить его с выводом, исследовать
+причину расхождения в GDB и проверить исправление. Исходные данные:
+\texttt{a\ =\ 7}, \texttt{b\ =\ 5}. Ожидаемый результат:
+\textbf{\texttt{7\ +\ 5\ =\ 12}}.
+
+\hypertarget{ux441ux440ux435ux434ux430-ux438-ux438ux441ux445ux43eux434ux43dux44bux439-ux444ux430ux439ux43b}{%
+\section{Среда и исходный
+файл}\label{ux441ux440ux435ux434ux430-ux438-ux438ux441ux445ux43eux434ux43dux44bux439-ux444ux430ux439ux43b}}
+
+Для воспроизведения использовалась среда Linux (Debian 12), GCC 12.2 и
+GDB 13.1 с параметрами \texttt{-g\ -O0}. Я создал каталог
+\texttt{\textasciitilde{}/aiya/demo-sum} и набрал \texttt{sum.c} в
+редакторе nano. Исходная ключевая строка была:
+
+\begin{verbatim}
+int result = a - b;
+\end{verbatim}
+
+Остальной код выводил результат через
+\texttt{printf("Сумма:\ \%d\textbackslash{}n",\ result);} и возвращал
+\texttt{0} из \texttt{main}. Полный исходник до исправления показан в
+демонстрационной лабораторной; файл программы я сохранил отдельно от
+отчёта.
+
+\hypertarget{ux43fux435ux440ux432ux44bux439-ux437ux430ux43fux443ux441ux43a-ux438-ux440ux430ux441ux445ux43eux436ux434ux435ux43dux438ux435}{%
+\section{Первый запуск и
+расхождение}\label{ux43fux435ux440ux432ux44bux439-ux437ux430ux43fux443ux441ux43a-ux438-ux440ux430ux441ux445ux43eux436ux434ux435ux43dux438ux435}}
+
+Из рабочего каталога я выполнил:
+
+\begin{verbatim}
+gcc -std=c11 -Wall -Wextra -g -O0 sum.c -o sum
+./sum
+echo $?
+\end{verbatim}
+
+GCC завершил сборку без предупреждений. Программа напечатала
+\textbf{\texttt{Сумма:\ 2}}; следующий \texttt{echo\ \$?} показал
+\texttt{0}. До запуска я ожидал \texttt{Сумма:\ 12}. Следовательно,
+программа завершилась успешно с точки зрения её собственного кода
+возврата, но вычислила \textbf{не ту операцию}. Отсутствие
+предупреждений компилятора не означает, что логика задачи верна.
+
+\hypertarget{ux43eux442ux43bux430ux434ux43aux430}{%
+\section{Отладка}\label{ux43eux442ux43bux430ux434ux43aux430}}
+
+Я запустил \texttt{gdb\ -q\ ./sum} и ввёл команды в приглашении
+\texttt{(gdb)}:
+
+\begin{verbatim}
+break sum.c:7
+run
+print a
+print b
+next
+print result
+quit
+\end{verbatim}
+
+Остановка была \textbf{перед} вычислением \texttt{result}. Наблюдения:
+\texttt{print\ a} → \texttt{7}, \texttt{print\ b} → \texttt{5}; после
+\texttt{next} команда \texttt{print\ result} → \texttt{2}. Числа в
+обозначениях ответов GDB (\texttt{\$1}, \texttt{\$2} и т. п.) относятся
+к истории отладчика и не являются адресами переменных. В исходнике
+стояло вычитание вместо требуемого сложения; проблема не была связана с
+вводом данных или сборкой.
+
+\hypertarget{ux438ux441ux43fux440ux430ux432ux43bux435ux43dux438ux435-ux438-ux43fux43eux432ux442ux43eux440ux43dux430ux44f-ux43fux440ux43eux432ux435ux440ux43aux430}{%
+\section{Исправление и повторная
+проверка}\label{ux438ux441ux43fux440ux430ux432ux43bux435ux43dux438ux435-ux438-ux43fux43eux432ux442ux43eux440ux43dux430ux44f-ux43fux440ux43eux432ux435ux440ux43aux430}}
+
+Исправил ровно одну строку и \textbf{пересобрал} программу:
+
+\begin{verbatim}
+// было: int result = a - b;
+int result = a + b;
+\end{verbatim}
+
+Для каждой дополнительной пары менял \texttt{a} и \texttt{b} в
+\texttt{sum.c}, снова выполнял указанную выше команду GCC и запускал
+\texttt{./sum}. Получил:
+
+\begin{longtable}[]{@{}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0700}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0700}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2600}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3400}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2200}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedleft
+\texttt{a}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+\texttt{b}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ожидалось
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Наблюдалось
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Код завершения
+\end{minipage} \\
+\midrule
+\endhead
+7 & 5 & \texttt{Сумма:\ 12} & \texttt{Сумма:\ 12} & 0 \\
+0 & 5 & \texttt{Сумма:\ 5} & \texttt{Сумма:\ 5} & 0 \\
+-3 & 5 & \texttt{Сумма:\ 2} & \texttt{Сумма:\ 2} & 0 \\
+\bottomrule
+\end{longtable}
+
+В конце вернул значения \texttt{a\ =\ 7}, \texttt{b\ =\ 5} и снова
+собрал программу. Файл \texttt{sum.c} и исполняемый файл \texttt{sum}
+сохранил для повторного показа.
+
+\hypertarget{ux432ux44bux432ux43eux434}{%
+\section{Вывод}\label{ux432ux44bux432ux43eux434}}
+
+Сравнение с заранее записанным ожиданием помогло обнаружить ошибку,
+которую GCC не распознал: программа вычитала \texttt{b} из \texttt{a}
+вместо сложения. Просмотр переменных и выполнение строки в GDB
+подтвердили причину результата \texttt{2}. После исправления и
+пересборки все три контрольные проверки совпали с ожидаемыми значениями.
+При подготовке собственного отчёта важно записывать \textbf{и неудачную
+попытку}, и подтверждение исправления --- с командами и наблюдениями.

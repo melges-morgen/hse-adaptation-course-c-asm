@@ -9,7 +9,7 @@ JOURNAL_IMAGE := adaptation-course-journal
 SEMINAR4_C_IMAGE := adaptation-course-seminar04-c
 STAGE ?= 6
 
-.PHONY: pdf pud-pdf practice-pdf clean docker-image slides-image lecture2-slides lecture2-original lecture2 lecture3-slides lecture3 lecture4-check lecture4-slides lecture4 lecture4-journal-check lecture4-journal-run lecture4-journal-slides lecture4-journal seminar4-factorial-check seminar4-handbook seminar4-materials seminar4 ubuntu-terminal-handbook ubuntu-terminal lab-report-handbook lab-report-check lab-report debian-install-handbook debian-install-check debian-install
+.PHONY: pdf pud-pdf practice-pdf clean docker-image slides-image lecture2-slides lecture2-original lecture2 lecture3-slides lecture3 lecture4-check lecture4-slides lecture4 lecture4-journal-check lecture4-journal-run lecture4-journal-slides lecture4-journal lecture4-quiz seminar4-factorial-check seminar4-handbook seminar4-teacher seminar4-materials seminar4 ubuntu-terminal-handbook ubuntu-terminal lab-report-handbook lab-report-check lab-report debian-install-handbook debian-install-check debian-install
 
 docker-image:
 	docker build -t $(IMAGE) .
@@ -19,7 +19,7 @@ pdf: docker-image
 		-v "$(CURDIR)":/workspace \
 		-w /workspace \
 		$(IMAGE) \
-		sh -c 'sh scripts/build-seminar04.sh fragment && sh scripts/build-debian-install.sh fragment && sh scripts/build-ubuntu-terminal.sh fragment && sh scripts/build-lab-report.sh fragment && latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=$(BUILD_DIR)/latex $(MAIN) && install -Dm644 $(BUILD_DIR)/latex/adaptation_course.pdf $(BUILD_DIR)/pdf/adaptation_course.pdf'
+		sh -c 'latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=$(BUILD_DIR)/latex $(MAIN) && install -Dm644 $(BUILD_DIR)/latex/adaptation_course.pdf $(BUILD_DIR)/pdf/adaptation_course.pdf'
 
 pud-pdf: docker-image
 	docker run --rm \
@@ -92,9 +92,20 @@ lecture4-journal-slides: slides-image
 
 lecture4-journal: pdf lecture4-journal-check lecture4-journal-slides
 
+lecture4-quiz: docker-image
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace $(IMAGE) \
+		sh -c 'set -e; for name in quiz-c quiz-journal teacher-key; do \
+			latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=$(BUILD_DIR)/latex/lecture04-quiz assessments/lecture04/$$name.tex; \
+			install -Dm644 $(BUILD_DIR)/latex/lecture04-quiz/$$name.pdf $(BUILD_DIR)/pdf/lecture04/$$name.pdf; \
+		done'
+
 seminar4-handbook: docker-image
 	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
 		$(IMAGE) sh scripts/build-seminar04.sh handbook
+
+seminar4-teacher: docker-image
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace $(IMAGE) \
+		sh -c 'sh scripts/build-tex-handbook.sh seminar04_teacher build/teacher/seminar04/guide build/teacher/seminar04/guide.pdf && sh scripts/build-tex-handbook.sh seminar04_defense build/teacher/seminar04/defense build/teacher/seminar04/defense.pdf'
 
 seminar4-factorial-check:
 	docker build -t $(SEMINAR4_C_IMAGE) demos/seminar04/factorial

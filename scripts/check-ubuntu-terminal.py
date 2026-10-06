@@ -30,7 +30,7 @@ pdf_path = root / "pdf/ubuntu-terminal/ubuntu-terminal.pdf"
 course_path = root / "pdf/adaptation_course.pdf"
 
 html = html_path.read_text(encoding="utf-8")
-assert 'lang="ru"' in html, "HTML must declare Russian"
+assert re.search(r"lang=['\"]ru['\"]", html), "HTML must declare Russian"
 parser = VisibleText()
 parser.feed(html)
 editions = (normalized(" ".join(parser.parts)), pdf_text(pdf_path), pdf_text(course_path))
@@ -53,7 +53,7 @@ match = re.search(r"Page size:\s+([\d.]+) x ([\d.]+) pts", info)
 assert match and abs(float(match[1]) - 595.28) < 1 and abs(float(match[2]) - 841.89) < 1, "Guide must be A4"
 
 log = (root / "latex/adaptation_course.log").read_text(encoding="utf-8", errors="replace")
-guide_log = log.split("(./build/latex/ubuntu_terminal_body.tex", 1)[1].split(
+guide_log = log.split("(./tex/supplementary/ubuntu_terminal_body.tex", 1)[1].split(
     "(./tex/backmatter/references.tex", 1
 )[0]
 assert "Overfull \\hbox" not in guide_log, "Supplementary guide has overfull lines in the course PDF"

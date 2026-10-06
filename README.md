@@ -41,11 +41,13 @@ slides/
   theme/                                # общая тема презентаций
 demos/lecture04/                        # проверяемые C/NASM-примеры в Docker
 demos/lecture04-journal/                # шесть 16-битных NASM-версий в QEMU
-demos/seminar04/                         # исходник методички и файлы семинара №4
+demos/seminar04/                         # исходники программ и файлы семинара №4
 demos/seminar04/factorial/               # базовый вариант: C, GCC, GDB
 tex/seminars/seminar04.tex               # подключение методички к общему пособию
-supplementary/ubuntu-terminal/README.md  # дополнительная методичка по Ubuntu и терминалу
-supplementary/debian-install/README.md    # дополнительная лабораторная по Debian и терминалу
+tex/seminars/seminar04_body.tex          # методичка журнала
+tex/seminars/seminar04_factorial_body.tex # методичка факториала
+tex/supplementary/ubuntu_terminal_body.tex # дополнительная методичка по терминалу
+tex/supplementary/debian_install_body.tex  # дополнительная лабораторная по Debian
 tex/supplementary/materials.tex          # общая часть дополнительных материалов
 tex/supplementary/ubuntu_terminal.tex    # подключение методички по Ubuntu
 supplementary/lab-report/                # демонстрационная работа и заполненный отчёт
@@ -351,7 +353,7 @@ make lecture4-journal-run STAGE=3 # ввод через BIOS INT 16h
 или усложнённый на NASM/BIOS. Оба включены в общее пособие и доступны
 отдельными HTML и A4 PDF.
 
-**Вариант 1 (базовый):** [методичка по факториалу](demos/seminar04/factorial/README.md).
+**Вариант 1 (базовый):** [исходник методички по факториалу](tex/seminars/seminar04_factorial_body.tex).
 Студент создаёт каталог и исходник через nano и Vim, собирает программу с
 предупреждениями и `-g -O0`, проверяет случаи 0–20, исследует ошибки в GDB
 и перенаправляет `stdin`, `stdout`, `stderr`. Исходник для автоматической
@@ -361,7 +363,7 @@ make lecture4-journal-run STAGE=3 # ввод через BIOS INT 16h
 `build/pdf/seminar04/seminar04-factorial.pdf`, материалы — в соседней
 папке `factorial/materials/` соответствующего формата.
 
-**Вариант 2 (усложнённый):** [методичка по журналу](demos/seminar04/README.md).
+**Вариант 2 (усложнённый):** [исходник методички по журналу](tex/seminars/seminar04_body.tex).
 Рекомендуется Debian Linux актуальной версии на компьютере или в виртуальной
 машине. Подойдёт и другой дистрибутив Linux, если доступны QEMU с графическим
 окном, NASM, GCC, GDB, binutils, `file` и базовые файловые утилиты.
@@ -375,9 +377,9 @@ make lecture4-journal-run STAGE=3 # ввод через BIOS INT 16h
 и новый номер сектора сохранения. Дома разбирают память в C/GDB,
 сопоставляют исполняемый ELF-файл с процессом Linux и проверяют
 вычисления и дисковый образ. Студенты выполняют команды
-сборки и проверяют результат сами. Из каждой методички в Docker собираются
+сборки и проверяют результат сами. Из каждого TeX-исходника в Docker собираются
 HTML, отдельный A4 PDF и текст выбранного варианта в общем пособии.
-`tex/seminars/seminar04.tex` подключает оба сгенерированных фрагмента;
+`tex/seminars/seminar04.tex` подключает оба фрагмента напрямую;
 для сборки общего пособия используйте `make pdf`.
 
 После распаковки студенческого архива из его папки:
@@ -403,11 +405,17 @@ nasm -f bin hello.asm -o hello.bin
 лекционного журнала. Полная методичка расположена рядом с комплектом.
 Старая презентация сохранена для исторической сверки в `legacy/slides/seminar04/`.
 
+Для преподавателя подготовлены [методические ответы](tex/teacher/seminar04_guide_body.tex)
+и [памятка для устной защиты](tex/teacher/seminar04_defense_body.tex):
+краткий маршрут и расширенный банк вопросов по обоим вариантам.
+`make seminar4-teacher` собирает отдельные HTML и PDF в `build/teacher/seminar04/`;
+эти материалы не включаются в студенческие комплекты.
+
 ## Дополнительные материалы: Debian, Ubuntu, лабораторная и отчёт
 
 ### Debian: установка и первое знакомство с терминалом
 
-[Дополнительная лабораторная](supplementary/debian-install/README.md) предлагает выбрать один
+[Дополнительная лабораторная](tex/supplementary/debian_install_body.tex) предлагает выбрать один
 маршрут: VirtualBox с Debian amd64 в Windows x86-64; установка Debian второй
 системой на Windows x86-64 с UEFI; UTM с Debian arm64 на Mac Apple Silicon;
 либо установка Debian рядом с macOS через установщик команды Debian Bananas
@@ -428,7 +436,7 @@ make debian-install
 
 Пошаговая методичка для компьютера с уже установленными Ubuntu и Windows:
 выбор Ubuntu в GRUB 2, запуск терминала, каталоги, файлы и редактор nano.
-Единый исходник — `supplementary/ubuntu-terminal/README.md`. В общем пособии
+Единый исходник — `tex/supplementary/ubuntu_terminal_body.tex`. В общем пособии
 это самостоятельная часть «Дополнительные материалы» перед литературой.
 Отдельные HTML и A4 PDF собираются в Docker:
 
@@ -447,7 +455,7 @@ make ubuntu-terminal
 Короткий опыт на C показывает путь «ожидание → неверный результат → GDB →
 исправление → повторные проверки». Студенты могут сравнить собственное
 оформление с заполненным образцом: исходники
-`supplementary/lab-report/README.md` и `supplementary/lab-report/report.md`.
+`tex/supplementary/lab_report_body.tex` и `tex/supplementary/lab_report_example_body.tex`.
 Отчёты по лабораторным **отправляют преподавателю в PDF или HTML**;
 исходники хранят отдельно для демонстрации. Собрать отдельные версии и
 общий PDF через Docker:

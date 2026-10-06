@@ -7,11 +7,11 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "supplementary/debian-install/reference/hello.c"
-GUIDE = ROOT / "supplementary/debian-install/README.md"
+GUIDE = ROOT / "tex/supplementary/debian_install_body.tex"
 
 code = SOURCE.read_text(encoding="utf-8")
 text = GUIDE.read_text(encoding="utf-8")
-assert "```c\n" + code.rstrip() + "\n```" in text, "The typed C program differs from the checked source"
+assert "\\begin{verbatim}\n" + code.rstrip() + "\n\\end{verbatim}" in text, "The typed C program differs from the checked source"
 
 with tempfile.TemporaryDirectory(prefix="debian-install-") as directory:
     binary = Path(directory) / "hello_c"

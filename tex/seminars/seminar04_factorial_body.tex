@@ -1,0 +1,595 @@
+\textbf{Выберите один вариант лабораторной работы №4.} Здесь вы вручную
+создаёте программу вычисления факториала на C, собираете её, запускаете
+и отлаживаете. Вариант 2 --- усложнённая работа с загрузочным сектором и
+журналом оценок; выполнять оба варианта не требуется.
+
+Среда: Debian актуальной версии или Ubuntu с GCC, GDB, nano и Vim.
+Используйте обычную учётную запись. Если нужна помощь с входом в Ubuntu,
+терминалом и каталогами, откройте дополнительную методичку «Загрузка
+Ubuntu и первые шаги в терминале».
+
+\hypertarget{ux43fux43eux440ux44fux434ux43eux43a-ux441ux434ux430ux447ux438-ux43bux430ux431ux43eux440ux430ux442ux43eux440ux43dux44bux445-ux440ux430ux431ux43eux442--ux432ux430ux440ux438ux430ux43dux442-1}{%
+\subsubsection{Порядок сдачи лабораторных работ --- вариант
+1}\label{ux43fux43eux440ux44fux434ux43eux43a-ux441ux434ux430ux447ux438-ux43bux430ux431ux43eux440ux430ux442ux43eux440ux43dux44bux445-ux440ux430ux431ux43eux442--ux432ux430ux440ux438ux430ux43dux442-1}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{На занятии} выполните часть работы, запишите команды, расчёты
+  и наблюдаемый результат и покажите его преподавателю. Это
+  промежуточный показ, а не окончательная сдача.
+\item
+  \textbf{К следующей лабораторной} завершите работу и подготовьте
+  отчёт: что сделали, как проверили, что ожидали и что наблюдали.
+  Сохраните исходники и результаты, чтобы повторить демонстрацию.
+  \textbf{Отправьте преподавателю отчёт в формате PDF или HTML.}
+\item
+  \textbf{В начале следующей лабораторной} пройдите короткий тест по
+  базовой теории предыдущей работы. Тест обязателен, но его результат не
+  является допуском к устной защите.
+\item
+  \textbf{Во время следующей лабораторной} индивидуально защитите
+  предыдущую работу: покажите преподавателю отчёт и работающий
+  результат, объясните свои действия и ответьте на вопросы. Если нужны
+  исправления, преподаватель укажет их.
+\item
+  \textbf{Последняя лабораторная} выполняется, показывается и защищается
+  на том же занятии. В его начале проходит тест по предпоследней работе;
+  отдельного следующего теста по последней работе не будет.
+\end{enumerate}
+
+На семинаре №4 покажите текущую версию \texttt{factorial.c}, сборку или
+отладку и запишите достигнутый результат. К семинару №5 завершите
+выбранный вариант, сохраните исходник и отчёт для защиты.
+
+\hypertarget{ux43fux43eux434ux433ux43eux442ux43eux432ux44cux442ux435-ux438ux43dux441ux442ux440ux443ux43cux435ux43dux442ux44b-ux438-ux43aux430ux442ux430ux43bux43eux433-ux43fux440ux43eux435ux43aux442ux430}{%
+\subsubsection{Подготовьте инструменты и каталог
+проекта}\label{ux43fux43eux434ux433ux43eux442ux43eux432ux44cux442ux435-ux438ux43dux441ux442ux440ux443ux43cux435ux43dux442ux44b-ux438-ux43aux430ux442ux430ux43bux43eux433-ux43fux440ux43eux435ux43aux442ux430}}
+
+В терминале проверьте инструменты: \texttt{gcc\ -\/-version},
+\texttt{gdb\ -\/-version}, \texttt{nano\ -\/-version},
+\texttt{vim\ -\/-version}. Если чего-то нет и у вас есть право
+устанавливать пакеты, в Debian/Ubuntu выполните
+\texttt{sudo\ apt\ update} и
+\texttt{sudo\ apt\ install\ gcc\ libc6-dev\ gdb\ nano\ vim}. На другом
+дистрибутиве названия пакетов могут отличаться. Команды ниже вводятся
+без знака \texttt{\$} приглашения оболочки.
+
+\begin{verbatim}
+mkdir -p ~/aiya/lab04-factorial
+cd ~/aiya/lab04-factorial
+pwd
+ls
+\end{verbatim}
+
+\texttt{mkdir\ -p} создаёт вложенные каталоги и не выдаёт ошибку, если
+они уже существуют; \texttt{\textasciitilde{}} --- ваш домашний каталог,
+\texttt{cd} меняет текущий каталог. \texttt{pwd} должен оканчиваться на
+\texttt{/aiya/lab04-factorial}. \texttt{ls} показывает файлы в нём: в
+первый раз каталог пуст.
+
+\hypertarget{ux43dux430ux43fux438ux448ux438ux442ux435-ux43fux435ux440ux432ux443ux44e-ux432ux435ux440ux441ux438ux44e-ux432-nano}{%
+\subsubsection{Напишите первую версию в
+nano}\label{ux43dux430ux43fux438ux448ux438ux442ux435-ux43fux435ux440ux432ux443ux44e-ux432ux435ux440ux441ux438ux44e-ux432-nano}}
+
+Введите \texttt{nano\ factorial.c} и наберите код \textbf{вручную}, не
+копируя готовый файл:
+
+\begin{verbatim}
+#include <stdio.h>
+
+unsigned long long factorial(unsigned int n)
+{
+    unsigned long long result = 1;
+    for (unsigned int i = 1; i <= n; ++i) {
+        result *= i;
+    }
+    return result;
+}
+
+int main(void)
+{
+    int n = 5;
+    unsigned long long value = factorial((unsigned int)n);
+    printf("factorial(%d) = %llu\n", n, value);
+    return 0;
+}
+\end{verbatim}
+
+Сохраните файл клавишами \textbf{Ctrl+O}, \textbf{Enter}, выйдите через
+\textbf{Ctrl+X}. Внизу nano запись \texttt{\^{}O} означает Ctrl+O.
+Проверьте наличие файла через \texttt{ls} и при желании прочитайте его
+через \texttt{cat\ factorial.c}.
+
+\texttt{main} --- начало программы. \texttt{factorial} умножает числа от
+1 до \texttt{n}; переменная \texttt{result} начинается с 1, поэтому при
+\texttt{n\ =\ 0} цикл не выполнится и получится \texttt{0!\ =\ 1}.
+\texttt{unsigned\ long\ long} хранит беззнаковое целое большой
+разрядности. \texttt{printf} печатает в стандартный вывод: \texttt{\%d}
+соответствует \texttt{int}, \texttt{\%llu} ---
+\texttt{unsigned\ long\ long}, \texttt{\textbackslash{}n} завершает
+строку. После исполнения \texttt{return\ 0} сообщает оболочке об
+успешном завершении.
+
+\hypertarget{ux441ux43eux431ux435ux440ux438ux442ux435-ux438-ux437ux430ux43fux443ux441ux442ux438ux442ux435-ux43fux440ux43eux433ux440ux430ux43cux43cux443}{%
+\subsubsection{Соберите и запустите
+программу}\label{ux441ux43eux431ux435ux440ux438ux442ux435-ux438-ux437ux430ux43fux443ux441ux442ux438ux442ux435-ux43fux440ux43eux433ux440ux430ux43cux43cux443}}
+
+\begin{verbatim}
+gcc -std=c11 -Wall -Wextra -Wpedantic -g -O0 \
+  factorial.c -o factorial
+./factorial
+echo $?
+\end{verbatim}
+
+Ожидаемый вывод: \texttt{factorial(5)\ =\ 120}, затем \texttt{0} от
+\texttt{echo\ \$?} (смотрите код завершения \textbf{сразу после} запуска
+программы). Если \texttt{gcc} напечатал ошибку, найдите строку и
+исправьте код; при неуспешной сборке \textbf{не запускайте старый} файл
+\texttt{factorial}. Оболочка ищет программы в каталогах \texttt{PATH},
+поэтому исполняемый файл в текущем каталоге запускаем через
+\texttt{./factorial}.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6900}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Флаг GCC
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Что делает
+\end{minipage} \\
+\midrule
+\endhead
+\texttt{-std=c11} & Выбирает стандарт языка C11. \\
+\texttt{-Wall} & Включает распространённые предупреждения. \\
+\texttt{-Wextra} & Включает дополнительные предупреждения. \\
+\texttt{-Wpedantic} & Предупреждает об отклонениях от выбранного
+стандарта языка. \\
+\texttt{-g} & Добавляет информацию для отладчика: имена функций и строки
+исходника. \\
+\texttt{-O0} & Выключает оптимизацию, чтобы проще сопоставлять код с
+шагами GDB. \\
+\texttt{-o\ factorial} & Задаёт имя исполняемого файла; без него GCC
+обычно создаёт \texttt{a.out}. \\
+\bottomrule
+\end{longtable}
+
+Позже можно попробовать \texttt{-Werror} (считать предупреждения
+ошибками), \texttt{-O2} (оптимизировать программу; при отладке
+отображение переменных может измениться) и \texttt{-c} (получить
+объектный файл без линковки и готовой программы). Для основного опыта
+оставьте \texttt{-g\ -O0}.
+
+Файл \texttt{factorial.c} --- текст исходника на диске;
+\texttt{factorial} после успешной сборки --- исполняемый файл на диске.
+При \texttt{./factorial} Linux создаёт \textbf{процесс}. После изменения
+\texttt{.c} старая исполняемая программа не меняется, пока вы не
+повторите сборку GCC.
+
+\hypertarget{ux438ux437ux43cux435ux43dux438ux442ux435-ux43fux440ux43eux433ux440ux430ux43cux43cux443-ux447ux435ux440ux435ux437-vim-ux438-ux434ux43eux431ux430ux432ux44cux442ux435-ux432ux432ux43eux434}{%
+\subsubsection{Измените программу через Vim и добавьте
+ввод}\label{ux438ux437ux43cux435ux43dux438ux442ux435-ux43fux440ux43eux433ux440ux430ux43cux43cux443-ux447ux435ux440ux435ux437-vim-ux438-ux434ux43eux431ux430ux432ux44cux442ux435-ux432ux432ux43eux434}}
+
+Сначала посмотрите редактор на знакомом файле:
+\texttt{vim\ factorial.c}. Vim открывается в \textbf{обычном режиме}:
+нажмите \texttt{i} для режима вставки и исправьте \texttt{int\ n\ =\ 5;}
+на \texttt{int\ n\ =\ 6;}. Нажмите \textbf{Esc}, затем наберите
+\texttt{:wq} и \textbf{Enter} --- сохранить и выйти. Пересоберите и
+запустите: ожидается \texttt{factorial(6)\ =\ 720}. Полезные команды из
+обычного режима: \texttt{:w} сохраняет без выхода, \texttt{:q} выходит
+при отсутствии несохранённых правок, \texttt{:q!} выходит \textbf{без
+сохранения}. Если буквы не вводятся в файл, вы остались в обычном
+режиме: нажмите \texttt{i}.
+
+Теперь снова откройте \texttt{vim\ factorial.c} (или
+\texttt{nano\ factorial.c}) и \textbf{замените содержимое} следующим
+кодом. Он читает одно целое число и явно разделяет обычный результат и
+ошибки:
+
+\begin{verbatim}
+#include <stdio.h>
+
+unsigned long long factorial(unsigned int n)
+{
+    unsigned long long result = 1;
+    for (unsigned int i = 1; i <= n; ++i) {
+        result *= i;
+    }
+    return result;
+}
+
+int main(void)
+{
+    int n;
+    if (fscanf(stdin, "%d", &n) != 1) {
+        fprintf(stderr, "Ошибка ввода.\n");
+        return 1;
+    }
+    if (n < 0 || n > 20) {
+        fprintf(stderr, "Нужно 0..20.\n");
+        return 1;
+    }
+    unsigned long long value = factorial((unsigned int)n);
+    printf("factorial(%d) = %llu\n", n, value);
+    return 0;
+}
+\end{verbatim}
+
+Сохраните изменения и \textbf{снова выполните команду GCC}. Запустите
+\texttt{./factorial}, введите \texttt{5} и нажмите Enter: результат
+должен быть \texttt{factorial(5)\ =\ 120}. Проверьте \texttt{0},
+\texttt{1}, \texttt{10}, \texttt{20}, \texttt{-1}, \texttt{21}, буквы
+вместо числа и пустой ввод (для конца ввода в интерактивном терминале
+нажмите \textbf{Ctrl+D} на пустой строке). Сравните с таблицей:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6900}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Ввод
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ожидаемое поведение
+\end{minipage} \\
+\midrule
+\endhead
+\texttt{0}, \texttt{1} & \texttt{factorial(0)\ =\ 1},
+\texttt{factorial(1)\ =\ 1} \\
+\texttt{5}, \texttt{10} & \texttt{120}, \texttt{3628800}
+соответственно \\
+\texttt{20} & \texttt{2432902008176640000} \\
+\texttt{-1}, \texttt{21}, буквы, конец ввода & Сообщение об ошибке,
+ненулевой код завершения \\
+\bottomrule
+\end{longtable}
+
+Число \texttt{20!} помещается в обычный 64-битный
+\texttt{unsigned\ long\ long}, а \texttt{21!\ =\ 51090942171709440000}
+больше максимально представимого значения \texttt{18446744073709551615};
+поэтому программа ограничивает ввод. Данный учебный пример читает
+\textbf{первое целое число типа \texttt{int}}, а не проверяет всю
+строку: после \texttt{5} лишний текст не распознаётся как ошибка. Ввод
+числа вне диапазона \texttt{int} тоже не рассчитан на обработку этим
+простым вариантом \texttt{fscanf}; не выдавайте такую проверку за полную
+защиту от любого ввода.
+
+\hypertarget{ux444ux430ux439ux43bux44b-ux438-ux442ux440ux438-ux441ux442ux430ux43dux434ux430ux440ux442ux43dux44bux445-ux43fux43eux442ux43eux43aux430}{%
+\subsubsection{Файлы и три стандартных
+потока}\label{ux444ux430ux439ux43bux44b-ux438-ux442ux440ux438-ux441ux442ux430ux43dux434ux430ux440ux442ux43dux44bux445-ux43fux43eux442ux43eux43aux430}}
+
+Файл --- последовательность байтов, сохраняемая файловой системой.
+Текстовый исходник, исполняемый файл и \texttt{input.txt} --- разные
+файлы; расширение \texttt{.c} само по себе не делает файл исполняемым.
+Программа на C работает с потоком \texttt{FILE\ *} (абстракция
+стандартной библиотеки), который может читать из терминала или файла и
+писать в терминал или файл. В Linux у процесса при запуске обычно
+открыты стандартные дескрипторы: 0 (ввод), 1 (вывод), 2 (ошибки).
+Объекты C \texttt{stdin}, \texttt{stdout}, \texttt{stderr} связаны с
+этими потоками, но \texttt{FILE\ *} --- \textbf{не номер дескриптора}.
+
+\texttt{fscanf(stdin,\ "\%d",\ \&n)} читает число из стандартного ввода
+и возвращает количество успешно прочитанных значений (здесь нужно
+\texttt{1}). Упрощённая запись --- \texttt{scanf("\%d",\ \&n)}; в обоих
+случаях нужен адрес \texttt{\&n} и проверка результата.
+\texttt{printf(...)} пишет в \texttt{stdout}, то же можно записать
+\texttt{fprintf(stdout,\ ...)}. \texttt{fprintf(stderr,\ ...)} пишет в
+отдельный поток ошибок. Эти функции \textbf{выводят} данные; для ввода
+служат \texttt{scanf}/\texttt{fscanf}.
+
+Скопируйте \texttt{input.txt} из комплекта материалов в рабочий каталог
+или создайте его командой \texttt{nano\ input.txt} и запишите число
+\texttt{5}. Если вы работаете без архива, достаточно варианта с nano.
+Затем выполните:
+
+\begin{verbatim}
+./factorial < input.txt > output.txt 2> errors.txt
+echo $?
+cat output.txt
+cat errors.txt
+\end{verbatim}
+
+\texttt{\textless{}} подаёт файл в \texttt{stdin},
+\texttt{\textgreater{}} сохраняет \texttt{stdout} (при повторе
+\textbf{перезаписывает} файл), \texttt{2\textgreater{}} сохраняет
+\texttt{stderr}. Ожидайте ответ в \texttt{output.txt} и пустой
+\texttt{errors.txt}. Измените \texttt{input.txt} на \texttt{21},
+повторите запуск и \textbf{сразу} проверьте \texttt{echo\ \$?}: теперь
+\texttt{output.txt} пуст, а сообщение --- в \texttt{errors.txt}.
+\texttt{\textgreater{}\textgreater{}} добавляет вывод к существующему
+файлу вместо перезаписи. Перенаправления оболочки влияют на запущенную
+программу; диагностические сообщения самого GCC при сборке --- отдельный
+запуск другого процесса.
+
+\hypertarget{ux43dux430ux439ux434ux438ux442ux435-ux43eux448ux438ux431ux43aux443-ux432-gdb}{%
+\subsubsection{Найдите ошибку в
+GDB}\label{ux43dux430ux439ux434ux438ux442ux435-ux43eux448ux438ux431ux43aux443-ux432-gdb}}
+
+Восстановите в \texttt{input.txt} число \texttt{5} и \textbf{снова
+соберите} программу с \texttt{-g\ -O0}: \texttt{-g} сохраняет имена
+переменных и соответствие строк исходнику, а \texttt{-O0} не даёт
+оптимизатору переставить или убрать интересующие нас вычисления.
+Работайте из каталога с \texttt{factorial.c}, \texttt{factorial} и
+\texttt{input.txt}. Сначала в \textbf{обычной оболочке} наберите:
+
+\begin{verbatim}
+gdb -q ./factorial
+\end{verbatim}
+
+\texttt{-q} скрывает вводный баннер. Появится приглашение
+\textbf{\texttt{(gdb)}}; дальнейшие команды вводите уже \emph{в
+отладчике}, без текста \texttt{(gdb)}. Выражение \texttt{./factorial}
+--- путь к исполняемому файлу, а не команда внутри GDB. На остановке GDB
+показывает строку, которую программа \textbf{собирается выполнить}: до
+первого \texttt{next} значение ещё не инициализированной локальной
+переменной читать нельзя. Номера строк ниже относятся к показанному выше
+коду; если вы добавляли строки в \texttt{factorial.c}, номера сдвинутся.
+
+\hypertarget{ux448ux430ux433-1-ux43eux441ux442ux430ux43dux43eux432ux438ux442ux435ux441ux44c-ux432-ux444ux443ux43dux43aux446ux438ux438}{%
+\paragraph{Шаг 1. Остановитесь в
+функции}\label{ux448ux430ux433-1-ux43eux441ux442ux430ux43dux43eux432ux438ux442ux435ux441ux44c-ux432-ux444ux443ux43dux43aux446ux438ux438}}
+
+\begin{verbatim}
+break factorial
+info breakpoints
+run < input.txt
+print n
+info args
+backtrace
+\end{verbatim}
+
+\texttt{break\ factorial} ставит точку останова на входе в функцию. GDB
+сообщает её \textbf{номер} (\texttt{Breakpoint\ 1}) и строку.
+\texttt{info\ breakpoints} показывает номера, состояние и места всех
+остановок; используйте реальные номера, которые видите у себя. Можно
+ставить остановку и по строке, например \texttt{break\ factorial.c:7}
+--- это строка \texttt{result\ *=\ i;} в исходнике из методички. Не
+добавляйте её пока, чтобы не изменить следующий опыт.
+
+\texttt{run\ \textless{}\ input.txt} \textbf{начинает новый запуск}
+программы: \texttt{\textless{}} подаёт файл в её стандартный ввод.
+Отладчик остановится в \texttt{factorial} до выполнения строки
+\texttt{unsigned\ long\ long\ result\ =\ 1;}. В сообщении
+\texttt{Breakpoint\ ...\ factorial\ (n=5)\ ...} важны функция, аргумент,
+имя файла и текущая строка; адреса и номера внутренних кадров могут
+отличаться. Если забыть \texttt{\textless{}\ input.txt}, программа может
+ждать число в терминале: введите \texttt{5} и Enter либо прервите
+выполнение клавишами \textbf{Ctrl+C} и повторите
+\texttt{run\ \textless{}\ input.txt}.
+
+\texttt{print\ n} покажет значение аргумента \texttt{5}. Запись вида
+\texttt{\$1\ =\ 5} --- это номер \textbf{результата команды
+\texttt{print} в истории GDB}, а не переменная C и не код завершения
+\texttt{\$?} из оболочки. \texttt{info\ args} перечислит аргументы
+текущей функции. \texttt{backtrace} (или \texttt{bt}) покажет цепочку
+вызовов: \texttt{\#0\ factorial} --- где мы остановились,
+\texttt{\#1\ main} --- кто вызвал функцию. Команда \texttt{frame\ 1}
+выбирает кадр \texttt{main} для просмотра его переменных,
+\texttt{frame\ 0} возвращает контекст просмотра в \texttt{factorial};
+сами эти команды \textbf{не выполняют программу}. Находясь в
+\texttt{main}, можно посмотреть его \texttt{n}, а \texttt{result} там
+недоступна.
+
+\hypertarget{ux448ux430ux433-2-ux432ux44bux43fux43eux43bux43dux44fux439ux442ux435-ux441ux442ux440ux43eux43aux438}{%
+\paragraph{Шаг 2. Выполняйте
+строки}\label{ux448ux430ux433-2-ux432ux44bux43fux43eux43bux43dux44fux439ux442ux435-ux441ux442ux440ux43eux43aux438}}
+
+Убедитесь, что выбран \texttt{frame\ 0}, затем введите:
+
+\begin{verbatim}
+next
+print result
+info locals
+next
+print i
+next
+print result
+\end{verbatim}
+
+Первый \texttt{next} выполнит \texttt{result\ =\ 1} и поставит указатель
+на заголовок \texttt{for}; теперь \texttt{print\ result} выдаёт
+\texttt{1}. \texttt{info\ locals} показывает доступные локальные
+переменные, но на заголовке \texttt{for} значение \texttt{i} до
+инициализации не следует считать результатом вычисления. Следующий
+\texttt{next} войдёт в первую итерацию и остановится перед
+\texttt{result\ *=\ i}: здесь \texttt{print\ i} покажет \texttt{1}. Ещё
+один \texttt{next} выполнит умножение \texttt{1\ ×\ 1}, поэтому
+\texttt{result} всё ещё \texttt{1}. У цикла есть заголовок, тело и
+переход к следующей итерации: один \texttt{next} \textbf{не обязательно
+равен одной итерации}. Если вы оказались на другой строке, посмотрите на
+строку, которую показывает GDB, и выполните следующую команду осознанно.
+
+\texttt{next} выполняет текущую строку, \textbf{не заходя внутрь}
+вызываемой функции; \texttt{step} на строке с вызовом заходит в неё. Для
+отдельного сравнения вернитесь в \texttt{main} новым запуском:
+\texttt{break\ main}, \texttt{run\ \textless{}\ input.txt}, затем
+делайте \texttt{next} до строки \texttt{value\ =\ factorial(...)} и
+введите \texttt{step} --- вы попадёте в \texttt{factorial}.
+\texttt{finish} продолжит выполнение текущей функции до \texttt{return}
+и остановится в вызывающей функции, показав возвращённое значение. При
+\texttt{step} на строке \texttt{printf} можно попасть в код библиотеки;
+для первого опыта удобнее \texttt{next} или \texttt{finish}. Перед
+следующим опытом удалите временную точку \texttt{break\ main} командой
+\texttt{delete\ НОМЕР} (номер смотрите через
+\texttt{info\ breakpoints}). При каждом повторном \texttt{run}
+выполнение начинается заново, но остальные точки останова остаются до их
+удаления.
+
+\hypertarget{ux448ux430ux433-3-ux441ux43bux435ux434ux438ux442ux435-ux437ux430-ux43fux440ux43eux438ux437ux432ux435ux434ux435ux43dux438ux435ux43c}{%
+\paragraph{Шаг 3. Следите за
+произведением}\label{ux448ux430ux433-3-ux441ux43bux435ux434ux438ux442ux435-ux437ux430-ux43fux440ux43eux438ux437ux432ux435ux434ux435ux43dux438ux435ux43c}}
+
+Проверьте через \texttt{info\ breakpoints}, что оставлена точка
+\texttt{break\ factorial}, но нет временной остановки в \texttt{main}.
+Начните новый запуск командой \texttt{run\ \textless{}\ input.txt}: при
+остановке на входе в \texttt{factorial} сначала выполните
+\textbf{\texttt{next}}, чтобы инициализировать \texttt{result}. Затем:
+
+\begin{verbatim}
+watch result
+info breakpoints
+continue
+print i
+print result
+continue
+continue
+continue
+print result
+\end{verbatim}
+
+\texttt{watch\ result} --- \textbf{точка наблюдения}: GDB остановится,
+когда значение \texttt{result} \emph{изменится}, и покажет
+\texttt{Old\ value} и \texttt{New\ value}. Первое умножение
+\texttt{1\ ×\ 1} не меняет \texttt{result}, поэтому первой новой
+величиной будет \textbf{2 при \texttt{i\ =\ 2}}. Затем повторные
+\texttt{continue} приведут к изменениям \textbf{2 → 6 → 24 → 120}. На
+последней остановке \texttt{print\ result} покажет \texttt{120};
+следующее \texttt{continue} завершит программу с напечатанным ответом.
+Не пытайтесь читать \texttt{result} уже после завершения: локальная
+переменная существовала только во время вызова функции.
+
+Для вывода значения на \textbf{каждой} остановке можно выполнить
+\texttt{display\ result}: GDB присвоит этому отображению номер и будет
+печатать значение автоматически, пока переменная доступна. Узнать номер
+можно через \texttt{info\ display}, отключить ---
+\texttt{undisplay\ НОМЕР}. \texttt{display} лишь показывает значение, а
+\texttt{watch} останавливает выполнение при изменении. Список остановок
+и их номера показывает \texttt{info\ breakpoints};
+\texttt{disable\ НОМЕР} временно выключает точку, \texttt{enable\ НОМЕР}
+включает обратно, \texttt{delete\ НОМЕР} удаляет её. Не подставляйте
+номер наугад: в список входят и \texttt{break}, и \texttt{watch}.
+
+\hypertarget{ux448ux430ux433-4-ux438ux441ux441ux43bux435ux434ux443ux439ux442ux435-ux441ux442ux435ux43a-ux438-ux43fux430ux43cux44fux442ux44c}{%
+\paragraph{Шаг 4. Исследуйте стек и
+память}\label{ux448ux430ux433-4-ux438ux441ux441ux43bux435ux434ux443ux439ux442ux435-ux441ux442ux435ux43a-ux438-ux43fux430ux43cux44fux442ux44c}}
+
+После завершения предыдущего запуска локальная точка
+\texttt{watch\ result} перестаёт действовать, поскольку переменная вышла
+из области видимости. Снова запустите
+\texttt{run\ \textless{}\ input.txt}, остановитесь в \texttt{factorial},
+выполните \texttt{next} для инициализации \texttt{result} и поставьте
+\texttt{watch\ result} заново. Четыре раза выполните \texttt{continue}:
+остановитесь на изменении с \texttt{24} на \texttt{120}. Пока вы внутри
+функции, выполните:
+
+\begin{verbatim}
+backtrace
+info locals
+print sizeof(result)
+print &result
+x/8xb &result
+\end{verbatim}
+
+\texttt{backtrace} снова покажет \texttt{\#0\ factorial} и
+\texttt{\#1\ main}. \texttt{info\ locals} позволяет сопоставить
+\texttt{i} и \texttt{result}. \texttt{sizeof(result)} в этой учебной
+среде x86-64 равен \textbf{8 байтам}. \texttt{\&result} --- адрес
+переменной в \emph{виртуальной} памяти процесса: конкретное число не
+переписывайте в отчёт как универсальный адрес. В команде
+\texttt{x/8xb\ \&result} буква \textbf{\texttt{x}} означает просмотр
+памяти, \textbf{\texttt{8}} --- восемь элементов, следующий
+\textbf{\texttt{x}} --- вывод в шестнадцатеричном виде,
+\textbf{\texttt{b}} --- размер элемента в один байт. Для
+\texttt{result\ =\ 120} (\texttt{0x78}) на типичном Linux x86-64
+ожидаются байты \texttt{0x78\ 0x00\ 0x00\ 0x00\ 0x00\ 0x00\ 0x00\ 0x00}:
+младший байт расположен первым (\emph{little-endian}). В начале опыта
+при \texttt{result\ =\ 1} первым байтом будет \texttt{0x01}; не
+смешивайте две разные остановки. Не путайте \texttt{x/8xb} со
+стандартной командой оболочки или с выражением C.
+
+\hypertarget{ux448ux430ux433-5-ux43dux430ux439ux434ux438ux442ux435-ux43eux448ux438ux431ux43aux443-ux432-ux443ux441ux43bux43eux432ux438ux438}{%
+\paragraph{Шаг 5. Найдите ошибку в
+условии}\label{ux448ux430ux433-5-ux43dux430ux439ux434ux438ux442ux435-ux43eux448ux438ux431ux43aux443-ux432-ux443ux441ux43bux43eux432ux438ux438}}
+
+Выйдите из GDB командой \texttt{quit}. Через nano или Vim
+\textbf{намеренно} измените условие в цикле на
+\texttt{i\ \textless{}\ n} и пересоберите с \texttt{-g\ -O0}. Для ввода
+\texttt{5} программа теперь выдаёт \textbf{24} вместо 120: последний
+множитель не используется. Снова откройте GDB и остановитесь
+непосредственно \textbf{перед умножением}:
+
+\begin{verbatim}
+break factorial.c:7
+run < input.txt
+print i
+print result
+continue
+\end{verbatim}
+
+Повторяйте \texttt{print\ i} и \texttt{continue} на остановках: до
+строки \texttt{result\ *=\ i;} вы дойдёте при
+\texttt{i\ =\ 1,\ 2,\ 3,\ 4}, но \textbf{не при \texttt{i\ =\ 5}}. Если
+строки в вашем файле сдвинулись, поставьте точку по актуальному номеру
+строки умножения (\texttt{list\ factorial} показывает исходник) или на
+входе в \texttt{factorial} и идите через \texttt{next}. Запишите, какие
+значения наблюдали и почему ответ равен 24. Восстановите
+\texttt{i\ \textless{}=\ n}, \textbf{пересоберите} программу и повторите
+проверку для \texttt{0}, \texttt{5} и \texttt{20}. Менять ожидаемый
+ответ вместо исправления цикла нельзя.
+
+Если GDB пишет \texttt{No\ symbol\ ...\ in\ current\ context},
+проверьте, остановлена ли программа \textbf{внутри нужной функции}:
+например, \texttt{i} видна только в области действия цикла, а после
+завершения процесса локальные переменные недоступны. Сообщение
+\texttt{The\ program\ is\ not\ being\ run} означает, что нужно выполнить
+\texttt{run}. Если GDB не знает имён и строк исходника, проверьте сборку
+с \texttt{-g} и то, что отлаживаете \textbf{заново собранный}
+\texttt{./factorial}. Если вывод отладчика отличается, попробуйте
+\texttt{help\ КОМАНДА} (например, \texttt{help\ watch}); \texttt{quit}
+закрывает GDB, а \texttt{Ctrl+C} прерывает ожидающую ввода или
+работающую программу.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2700}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6900}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Команда
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Краткая памятка
+\end{minipage} \\
+\midrule
+\endhead
+\texttt{break}, \texttt{info\ breakpoints} & Остановиться в функции или
+на строке, показать точки и их номера. \\
+\texttt{run}, \texttt{continue} & Запустить сначала с вводом из файла;
+продолжить текущий запуск. \\
+\texttt{next}, \texttt{step}, \texttt{finish} & Выполнить строку без
+захода в вызов, войти в функцию, завершить функцию. \\
+\texttt{print}, \texttt{info\ args}, \texttt{info\ locals} & Узнать
+значение выражения, аргументы и локальные переменные. \\
+\texttt{watch}, \texttt{display} & Остановиться при изменении; показать
+значение при остановках. \\
+\texttt{backtrace}, \texttt{frame} & Показать стек вызовов и выбрать
+кадр для просмотра. \\
+\texttt{x/8xb}, \texttt{help}, \texttt{quit} & Прочитать восемь байтов
+памяти, открыть справку, выйти из GDB. \\
+\bottomrule
+\end{longtable}
+
+\hypertarget{ux441ux430ux43cux43eux441ux442ux43eux44fux442ux435ux43bux44cux43dux430ux44f-ux440ux430ux431ux43eux442ux430-ux438-ux43eux442ux447ux451ux442}{%
+\subsubsection{Самостоятельная работа и
+отчёт}\label{ux441ux430ux43cux43eux441ux442ux43eux44fux442ux435ux43bux44cux43dux430ux44f-ux440ux430ux431ux43eux442ux430-ux438-ux43eux442ux447ux451ux442}}
+
+Добавьте внутри цикла после умножения строку
+\texttt{fprintf(stderr,\ "i=\%u\ result=\%llu\textbackslash{}n",\ i,\ result);}
+и пересоберите. Запустите программу с перенаправлениями: убедитесь, что
+ответ остаётся в \texttt{output.txt}, а шаги вычисления попадают в
+\texttt{errors.txt}. Объясните, почему для успеха код завершения
+остаётся \texttt{0}, хотя в \texttt{stderr} появился текст. После опыта
+удалите дополнительный диагностический вывод или оставьте его и укажите
+это в отчёте.
+
+В отчёте приведите команды создания каталога, сборки, запуска и GDB;
+сравнение ожидаемого и наблюдаемого для \texttt{0}, \texttt{5},
+\texttt{20}, \texttt{-1}, \texttt{21} и ошибочного ввода; состояние
+\texttt{stdout}, \texttt{stderr} и кода завершения; найденную и
+исправленную ошибку \texttt{i\ \textless{}\ n}; объяснение различий
+между исходником, исполняемым файлом и процессом. Для ориентира по
+структуре посмотрите «Пример отчёта: сумма двух чисел» в дополнительных
+материалах; пример относится к другой, демонстрационной задаче.
+Отправьте преподавателю \textbf{свой} отчёт в PDF или HTML. Сохраните
+свой \texttt{factorial.c} и проверочные файлы отдельно для
+индивидуальной защиты. Покажите преподавателю собственный результат и
+объясните его, не только продемонстрируйте готовый вывод.

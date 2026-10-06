@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parent.parent
 BASE = ROOT / "supplementary/lab-report"
 BROKEN = (BASE / "reference/sum-error.c").read_text(encoding="utf-8")
 FIXED = (BASE / "reference/sum.c").read_text(encoding="utf-8")
-GUIDE = (BASE / "README.md").read_text(encoding="utf-8")
-REPORT = (BASE / "report.md").read_text(encoding="utf-8")
-assert "```c\n" + BROKEN.rstrip() + "\n```" in GUIDE, "The typed example differs from the checked source"
+GUIDE = (ROOT / "tex/supplementary/lab_report_body.tex").read_text(encoding="utf-8")
+REPORT = (ROOT / "tex/supplementary/lab_report_example_body.tex").read_text(encoding="utf-8")
+assert "\\begin{verbatim}\n" + BROKEN.rstrip() + "\n\\end{verbatim}" in GUIDE, "The typed example differs from the checked source"
 assert FIXED == BROKEN.replace("a - b", "a + b"), "The fix must change only the operation"
 
 with tempfile.TemporaryDirectory(prefix="demo-lab-") as directory:
@@ -41,7 +41,7 @@ with tempfile.TemporaryDirectory(prefix="demo-lab-") as directory:
         code = FIXED.replace("int a = 7;", f"int a = {a};").replace("int b = 5;", f"int b = {b};")
         result = compile_and_run(code)
         assert result.stdout.strip() == f"Сумма: {expected}" and result.returncode == 0 and not result.stderr
-        assert f"Сумма: {expected}" in REPORT
+        assert f"Сумма:\\ {expected}" in REPORT
 
-assert "Сумма: 2" in REPORT and "print result" in REPORT
+assert "Сумма:\\ 2" in REPORT and "print result" in REPORT
 print("demo lab: wrong answer, GDB observations and corrected cases — OK")

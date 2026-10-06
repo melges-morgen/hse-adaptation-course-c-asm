@@ -22,10 +22,10 @@ def normalized(text):
 
 
 root = Path(sys.argv[1] if len(sys.argv) > 1 else "build")
-source = Path("supplementary/debian-install/README.md").read_text(encoding="utf-8")
+source = Path("tex/supplementary/debian_install_body.tex").read_text(encoding="utf-8")
 assert "чернов" not in source.casefold(), "Student guide still mentions the draft"
 html = (root / "html/debian-install/index.html").read_text(encoding="utf-8")
-assert 'lang="ru"' in html, "HTML language declaration missing"
+assert re.search(r"lang=['\"]ru['\"]", html), "HTML language declaration missing"
 parser = VisibleText()
 parser.feed(html)
 pdf = root / "pdf/debian-install/debian-install.pdf"
@@ -59,7 +59,7 @@ assert course.index("Установка Debian и знакомство с тер
 ) < course.index("Используемая литература", start), "Supplementary chapter order is wrong"
 
 log = (root / "latex/adaptation_course.log").read_text(encoding="utf-8", errors="replace")
-section = log.split("(./build/latex/debian_install_body.tex", 1)[1].split(
+section = log.split("(./tex/supplementary/debian_install_body.tex", 1)[1].split(
     "(./tex/supplementary/ubuntu_terminal.tex", 1
 )[0]
 assert "Overfull \\hbox" not in section, "Course PDF has overfull text in the Debian lab"

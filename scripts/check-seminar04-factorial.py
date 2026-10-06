@@ -8,13 +8,13 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "demos/seminar04/factorial/reference/factorial.c"
-GUIDE = ROOT / "demos/seminar04/factorial/README.md"
+GUIDE = ROOT / "tex/seminars/seminar04_factorial_body.tex"
 
 
 with tempfile.TemporaryDirectory(prefix="seminar04-factorial-") as directory:
     binary = Path(directory) / "factorial"
     text = GUIDE.read_text(encoding="utf-8")
-    assert text.count("```c\n" + SOURCE.read_text(encoding="utf-8").rstrip() + "\n```") == 1, (
+    assert text.count("\\begin{verbatim}\n" + SOURCE.read_text(encoding="utf-8").rstrip() + "\n\\end{verbatim}") == 1, (
         "The C block students type must match the checked C source"
     )
     subprocess.run(
@@ -64,9 +64,10 @@ with tempfile.TemporaryDirectory(prefix="seminar04-factorial-") as directory:
     assert re.findall(r"\$\d+ = (\d+)", broken_trace.stdout) == ["1", "2", "3", "4"], broken_trace.stdout
     assert "factorial(5) = 24" in broken_trace.stdout, broken_trace.stdout
 
-    for heading in ("### Шаг 1. Остановитесь в функции", "### Шаг 2. Выполняйте строки",
-                    "### Шаг 3. Следите за произведением", "### Шаг 4. Исследуйте стек и память",
-                    "### Шаг 5. Найдите ошибку в условии"):
-        assert heading in text, f"GDB walkthrough is missing {heading}"
+    normalized_guide = " ".join(text.split())
+    for heading in ("Шаг 1. Остановитесь в функции", "Шаг 2. Выполняйте строки",
+                    "Шаг 3. Следите за произведением", "Шаг 4. Исследуйте стек и память",
+                    "Шаг 5. Найдите ошибку в условии"):
+        assert heading in normalized_guide, f"GDB walkthrough is missing {heading}"
 
 print("seminar04 factorial: GCC, cases, stderr and GDB — OK")
