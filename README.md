@@ -408,7 +408,8 @@ nasm -f bin hello.asm -o hello.bin
 Для преподавателя подготовлены [методические ответы](tex/teacher/seminar04_guide_body.tex)
 и [памятка для устной защиты](tex/teacher/seminar04_defense_body.tex):
 краткий маршрут и расширенный банк вопросов по обоим вариантам.
-`make seminar4-teacher` собирает отдельные HTML и PDF в `build/teacher/seminar04/`;
+`make seminar4-teacher` собирает HTML в `build/teacher/seminar04/`, а PDF —
+в `build/pdf/teacher/seminar04/`;
 эти материалы не включаются в студенческие комплекты.
 
 ## Дополнительные материалы: Debian, Ubuntu, лабораторная и отчёт

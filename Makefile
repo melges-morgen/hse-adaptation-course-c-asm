@@ -105,7 +105,7 @@ seminar4-handbook: docker-image
 
 seminar4-teacher: docker-image
 	docker run --rm -v "$(CURDIR)":/workspace -w /workspace $(IMAGE) \
-		sh -c 'sh scripts/build-tex-handbook.sh seminar04_teacher build/teacher/seminar04/guide build/teacher/seminar04/guide.pdf && sh scripts/build-tex-handbook.sh seminar04_defense build/teacher/seminar04/defense build/teacher/seminar04/defense.pdf'
+		sh -c 'sh scripts/build-tex-handbook.sh seminar04_teacher build/teacher/seminar04/guide build/pdf/teacher/seminar04/guide.pdf && sh scripts/build-tex-handbook.sh seminar04_defense build/teacher/seminar04/defense build/pdf/teacher/seminar04/defense.pdf'
 
 seminar4-factorial-check:
 	docker build -t $(SEMINAR4_C_IMAGE) demos/seminar04/factorial
