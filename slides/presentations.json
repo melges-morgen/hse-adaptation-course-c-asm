@@ -21,6 +21,11 @@
     "mainSlides": 38,
     "pdf": "lecture03-slides.pdf"
   },
+  "lecture05": {
+    "slides": 53,
+    "mainSlides": 50,
+    "pdf": "lecture05-slides.pdf"
+  },
   "lecture02-original": {
     "slides": 60,
     "mainSlides": 51,

@@ -20,6 +20,10 @@ const byLesson = {
     file('demos/lecture04-journal/boot16.asm', 'boot16.asm'),
     ...journalStages,
   ],
+  lecture05: [
+    file('demos/lecture05/materials/README.md', 'README.md'),
+    file('demos/lecture05/process_demo.c', 'process_demo.c'),
+  ],
   seminar04: [
     file('demos/seminar04/materials/README.md', 'README.md'),
     file('demos/seminar04/hello.asm', 'hello.asm'),
@@ -31,6 +35,11 @@ const byLesson = {
   'seminar04/factorial': [
     file('demos/seminar04/factorial/materials/README.md', 'README.md'),
     file('demos/seminar04/factorial/materials/input.txt', 'input.txt'),
+  ],
+  seminar05: [
+    file('demos/seminar05/materials/README.md', 'README.md'),
+    file('demos/seminar05/status_demo.c', 'status_demo.c'),
+    file('demos/seminar05/isolation_demo.c', 'isolation_demo.c'),
   ],
 };
 

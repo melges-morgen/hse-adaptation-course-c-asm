@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 310" role="img" aria-labelledby="title desc">
+  <title id="title">Таймер помогает дать процессор другой готовой задаче</title>
+  <desc id="desc">Вычислительная задача B заняла CPU и не ждёт устройство. Сигнал таймера возвращает управление ядру; планировщик выбирает готовую A на следующий квант, затем B снова может продолжить работу. На одном CPU в каждый момент работает одна задача.</desc>
+  <g font-family="Carlito, sans-serif">
+    <text x="45" y="45" fill="#8bbcff" font-size="24" font-weight="700">ОДИН CPU · ГОТОВЫЕ A И B</text>
+    <text x="45" y="132" fill="#f0f4f8" font-size="22">CPU</text>
+    <path d="M205 144H996" fill="none" stroke="#8bbcff" stroke-width="3"/>
+    <rect x="205" y="101" width="330" height="46" rx="7" fill="#25283f" stroke="#00d4aa" stroke-width="2"/>
+    <rect x="540" y="101" width="245" height="46" rx="7" fill="#25283f" stroke="#8bbcff" stroke-width="2"/>
+    <rect x="790" y="101" width="205" height="46" rx="7" fill="#25283f" stroke="#00d4aa" stroke-width="2"/>
+    <g fill="#f0f4f8" font-size="22" text-anchor="middle">
+      <text x="370" y="131">B считает</text>
+      <text x="662" y="131">A получает CPU</text>
+      <text x="892" y="131">B продолжает</text>
+    </g>
+    <g stroke="#ffcf74" stroke-width="2" stroke-dasharray="7 6">
+      <path d="M537 88V192"/><path d="M788 88V192"/>
+    </g>
+    <g fill="#ffcf74" font-size="19" text-anchor="middle">
+      <text x="536" y="82">таймер</text><text x="788" y="82">таймер</text>
+    </g>
+    <text x="45" y="216" fill="#8bbcff" font-size="22">Таймер → ядро → решение планировщика → следующий квант</text>
+    <text x="45" y="266" fill="#f0f4f8" font-size="20">B не завершилось: его состояние сохранено, позже работа продолжится.</text>
+    <text x="950" y="298" fill="#8bbcff" font-size="17">Время →</text>
+  </g>
+</svg>

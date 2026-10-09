@@ -1,0 +1,47 @@
+% Пересечения проводов без точки не являются соединениями.
+\newcommand{\krCommonScheme}{%
+\begin{center}
+\begin{tikzpicture}[line width=.85pt, every node/.style={font=\small}]
+\node[draw, minimum width=1.35cm, minimum height=.8cm] (or) at (2,2.45) {ИЛИ};
+\node[draw, minimum width=2.2cm, minimum height=.9cm, align=center] (xor) at (2,1.4) {исключ.\\ИЛИ};
+\node[draw, minimum width=1.15cm, minimum height=.7cm] (invb) at (2,.15) {НЕ};
+\node[draw, minimum width=1cm, minimum height=.8cm] (and1) at (4.4,1.9) {И};
+\node[draw, minimum width=1cm, minimum height=.8cm] (and2) at (6.2,1.05) {И};
+\node[draw, minimum width=1cm, minimum height=.7cm] (inv) at (7.7,1.05) {НЕ};
+\draw (0,3) node[left] {$A$} -- (.45,3) -- (.45,1.6) -- (.9,1.6);
+\draw (.45,2.65) -- (1.325,2.65);
+\fill (.45,2.65) circle (1.5pt);
+\draw (0,2) node[left] {$B$} -- (.6,2) -- (.6,2.25) -- (.6,.15) -- (1.425,.15);
+\draw (.6,2.25) -- (1.325,2.25);
+\fill (.6,2) circle (1.5pt);
+\draw (0,1) node[left] {$C$} -- (.8,1) -- (.8,1.2) -- (.9,1.2);
+\draw (2.675,2.45) -- (3.4,2.45) -- (3.4,2.1) -- (3.9,2.1);
+\draw (3.1,1.4) -- (3.35,1.4) -- (3.35,1.7) -- (3.9,1.7);
+\draw (4.9,1.9) -- (5.35,1.9) -- (5.35,1.25) -- (5.7,1.25);
+\draw (2.575,.15) -- (5.25,.15) -- (5.25,.85) -- (5.7,.85);
+\draw (6.7,1.05) -- (7.2,1.05);
+\draw (8.2,1.05) -- (8.7,1.05) node[right] {$F$};
+\end{tikzpicture}
+\end{center}}
+
+\newcommand{\krShiftScheme}{%
+\begin{center}
+\begin{tikzpicture}[line width=.85pt, every node/.style={font=\small}]
+\node[draw, minimum width=2.2cm, minimum height=.9cm, align=center] (xor) at (2,2.5) {исключ.\\ИЛИ};
+\node[draw, minimum width=1cm, minimum height=.8cm] (and1) at (4.1,1.8) {И};
+\node[draw, minimum width=1.1cm, minimum height=.8cm] (or) at (6,1.2) {ИЛИ};
+\node[draw, minimum width=1cm, minimum height=.7cm] (inv) at (7.7,1.2) {НЕ};
+\node[draw, minimum width=1cm, minimum height=.8cm] (and2) at (9.5,1) {И};
+\draw (0,3) node[left] {$A$} -- (.45,3) -- (.45,-.25) -- (8.85,-.25) -- (8.85,.8) -- (9,.8);
+\fill (.45,2.7) circle (1.5pt);
+\draw (.45,2.7) -- (.9,2.7);
+\draw (0,2) node[left] {$B$} -- (.75,2) -- (.75,2.3) -- (.9,2.3);
+\draw (0,1) node[left] {$C$} -- (3.1,1) -- (3.1,1.6) -- (3.6,1.6);
+\draw (3.1,2.5) -- (3.4,2.5) -- (3.4,2) -- (3.6,2);
+\draw (4.6,1.8) -- (5.05,1.8) -- (5.05,1.4) -- (5.45,1.4);
+\draw (0,.1) node[left] {$D$} -- (4.9,.1) -- (4.9,1) -- (5.45,1);
+\draw (6.55,1.2) -- (7.2,1.2);
+\draw (8.2,1.2) -- (8.6,1.2) -- (8.6,1.2) -- (9,1.2);
+\draw (10,1) -- (10.5,1) node[right] {$F$};
+\end{tikzpicture}
+\end{center}}

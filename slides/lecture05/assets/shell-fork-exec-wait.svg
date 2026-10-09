@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 360" role="img" aria-labelledby="title desc">
+  <title id="title">Интерактивная оболочка запрашивает у ядра запуск команды</title>
+  <desc id="desc">Shell — пользовательская программа, принимающая команду пользователя. Shell просит ядро создать дочерний процесс через fork и ждёт через wait. Child вызывает execvp; ядро загружает новую программу в тот же PID. После exit ядро возвращает shell статус, и shell показывает пользователю новое приглашение.</desc>
+  <defs>
+    <marker id="arrow-accent" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#00d4aa"/></marker>
+    <marker id="arrow-blue" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#8bbcff"/></marker>
+    <marker id="arrow-warn" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#ffd580"/></marker>
+  </defs>
+
+  <g fill="#8bbcff" font-family="Carlito, sans-serif" font-size="19" font-weight="700" text-anchor="middle">
+    <text x="220" y="30">SHELL · USER PROGRAM</text>
+    <text x="590" y="30">KERNEL · OS</text>
+    <text x="930" y="30">CHILD PROCESS</text>
+    <text x="24" y="190" transform="rotate(-90 24 190)">Время</text>
+  </g>
+  <path d="M220 43V344M590 43V344M930 43V344" fill="none" stroke="#8bbcff" stroke-width="3" stroke-dasharray="8 8"/>
+  <text x="220" y="56" fill="#b9c5d4" font-family="Carlito, sans-serif" font-size="16" text-anchor="middle">пользователь вводит команду</text>
+
+  <path d="M230 78H580" fill="none" stroke="#00d4aa" stroke-width="4" marker-end="url(#arrow-accent)"/>
+  <rect x="365" y="61" width="110" height="34" rx="17" fill="#25283f" stroke="#00d4aa" stroke-width="2"/>
+  <text x="420" y="84" fill="#00d4aa" font-family="CourseMono, monospace" font-size="18" text-anchor="middle">fork()</text>
+
+  <path d="M600 119H920" fill="none" stroke="#00d4aa" stroke-width="4" marker-end="url(#arrow-accent)"/>
+  <text x="760" y="112" fill="#00d4aa" font-family="Carlito, sans-serif" font-size="17" text-anchor="middle">ядро создаёт child · новый PID</text>
+
+  <path d="M230 158H580" fill="none" stroke="#ffd580" stroke-width="4" marker-end="url(#arrow-warn)"/>
+  <text x="405" y="151" fill="#ffd580" font-family="CourseMono, monospace" font-size="17" text-anchor="middle">wait(&amp;status)</text>
+  <rect x="96" y="170" width="248" height="42" rx="8" fill="#25283f" stroke="#ffd580" stroke-width="2"/>
+  <text x="220" y="197" fill="#ffd580" font-family="Carlito, sans-serif" font-size="18" text-anchor="middle">shell блокируется</text>
+
+  <path d="M920 218H600" fill="none" stroke="#8bbcff" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="760" y="211" fill="#8bbcff" font-family="CourseMono, monospace" font-size="16" text-anchor="middle">execvp() → execve</text>
+  <rect x="490" y="225" width="200" height="44" rx="7" fill="#25283f" stroke="#8bbcff" stroke-width="2"/>
+  <text x="590" y="243" fill="#f0f4f8" font-family="Carlito, sans-serif" font-size="15" text-anchor="middle">ядро загружает cc</text>
+  <text x="590" y="261" fill="#b9c5d4" font-family="Carlito, sans-serif" font-size="14" text-anchor="middle">PID прежний</text>
+
+  <path d="M600 274H920" fill="none" stroke="#00d4aa" stroke-width="4" marker-end="url(#arrow-accent)"/>
+  <rect x="815" y="280" width="220" height="27" rx="7" fill="#25283f" stroke="#00d4aa" stroke-width="2"/>
+  <text x="925" y="299" fill="#00d4aa" font-family="Carlito, sans-serif" font-size="15" text-anchor="middle">cc выполняется</text>
+
+  <path d="M920 318H600" fill="none" stroke="#8bbcff" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="760" y="312" fill="#8bbcff" font-family="CourseMono, monospace" font-size="15" text-anchor="middle">exit(status)</text>
+  <path d="M580 344H230" fill="none" stroke="#ffd580" stroke-width="4" marker-end="url(#arrow-warn)"/>
+  <text x="405" y="330" fill="#ffd580" font-family="Carlito, sans-serif" font-size="13" text-anchor="middle">ядро возвращает статус → shell показывает prompt</text>
+</svg>

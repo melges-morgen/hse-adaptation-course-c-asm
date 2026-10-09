@@ -1,0 +1,427 @@
+\label{seminar05}
+\subsection{Цель и подготовка}
+
+В этой лабораторной две части, выполняемые \textbf{по порядку}. Сначала вы
+создадите локальный репозиторий Git и зафиксируете исходную версию двух
+программ. В том же репозитории проверите игнорирование файлов, ветки и
+обмен с другим локальным клоном. Затем соберёте программы в Linux и
+исследуете коды возврата, процессы и их память. После опытов измените
+один исходник и зафиксируете результат ещё одним коммитом.
+
+\subsection{Порядок сдачи лабораторной работы}
+
+\begin{enumerate}
+    \item На занятии выполните часть работы, зафиксируйте команды и наблюдения и покажите результат преподавателю. Если в процессе работы возникли вопросы, задайте их преподавателю.
+    \item К следующему лабораторному занятию завершите работу, изучите использованные команды и понятия, подготовьтесь объяснить работу программ, механизмов Git, процессов и памяти. Подготовьте отчёт по обеим частям согласно разделу «Отчёт» и отправьте его преподавателю в формате PDF или HTML. Сохраните исходники, оба рабочих каталога и репозиторий отдельно для демонстрации.
+    \item На следующем занятии индивидуально защитите работу: покажите преподавателю отчёт и результат, объясните свои действия и ответьте на вопросы. Преподаватель сообщит, если нужно что-то исправить.
+    \item На последнем занятии защитите предыдущую лабораторную работу и сдайте оставшиеся задолженности. Преподаватель объявит текущую накопленную оценку за лабораторные работы.
+\end{enumerate}
+
+Для работы нужны терминал Linux, \texttt{git}, \texttt{gcc}, \texttt{ps},
+\texttt{file} и два файла \texttt{status\_demo.c},
+\texttt{isolation\_demo.c} из комплекта материалов семинара №5. Команды ниже
+рассчитаны на Bash в Debian/Ubuntu; знак приглашения \texttt{\$} не вводите.
+Проверьте инструменты:
+
+\begin{verbatim}
+git --version
+gcc --version
+ps --version
+\end{verbatim}
+
+Если программ нет, в учебной Debian/Ubuntu установите пакеты (могут
+потребоваться права администратора):
+
+\begin{verbatim}
+sudo apt update
+sudo apt install git gcc libc6-dev file procps
+\end{verbatim}
+
+Создайте отдельный рабочий каталог:
+
+\begin{verbatim}
+mkdir -p ~/aiya/lab05
+\end{verbatim}
+
+Поместите в него три выданных файла: \texttt{README.md},
+\texttt{status\_demo.c} и \texttt{isolation\_demo.c}. Затем перейдите
+в рабочий каталог и проверьте его содержимое:
+
+\begin{verbatim}
+cd ~/aiya/lab05
+ls
+\end{verbatim}
+
+Перед переходом к части I убедитесь, что \texttt{ls} показывает все три
+файла. Создавайте Git-репозиторий только в своём рабочем каталоге.
+
+\subsection{Часть I. Первый локальный репозиторий Git}
+
+Git хранит историю \emph{файлов проекта}.
+\textbf{Рабочая директория} содержит текущие файлы, \textbf{индекс} (staging
+area) --- то, что войдёт в следующий коммит, \textbf{коммит} фиксирует
+снимок проекта. Удалённый сервис и учётная запись для этой работы не нужны.
+
+\subsubsection*{Создайте и проверьте репозиторий}
+
+\begin{verbatim}
+git init
+git status
+\end{verbatim}
+
+Ожидайте сообщения о новом репозитории и списке ещё не отслеживаемых файлов
+(untracked). Название исходной ветки может зависеть от настроек Git. Если
+Git при коммите попросит имя автора, настройте \emph{только этот} репозиторий:
+\texttt{git config -{}-local user.name "Ваше имя"} и
+\texttt{git config -{}-local user.email "ваш адрес"}. Не копируйте в отчёт
+чужие имя или адрес из примера.
+
+Исполняемые файлы и временные результаты не следует добавлять в историю.
+Откройте \texttt{nano .gitignore} и запишите строки (сохранить: Ctrl+O,
+Enter; выйти: Ctrl+X):
+
+\begin{verbatim}
+/status_demo
+/isolation_demo
+/input.txt
+/result.txt
+/error.txt
+*.o
+\end{verbatim}
+
+Начальный символ \texttt{/} ограничивает правило корнем этого репозитория.
+Проверьте, что хотите сохранить именно исходники и инструкции, затем
+зафиксируйте первую версию:
+
+\begin{verbatim}
+git add README.md status_demo.c isolation_demo.c .gitignore
+git status
+git diff --cached
+git commit -m "Add starting files for lab 5"
+git log -1 --oneline
+git status
+\end{verbatim}
+
+\texttt{git diff -{}-cached} показывает изменения в индексе до коммита;
+обычный \texttt{git diff} показывает ещё не добавленные изменения рабочего
+файла. Если Git открыл длинный вывод в просмотрщике \texttt{less}, нажмите
+\textbf{q} для выхода. После коммита \texttt{git status} должен сообщать об отсутствии
+незафиксированных изменений. Запишите в отчёт краткий идентификатор первого
+коммита и своими словами объясните, что попало в него. Команда
+\mbox{\texttt{git add .}} добавляет все подходящие изменения из текущего каталога;
+в этой работе используйте имена файлов, чтобы перед коммитом видеть
+точный состав индекса. \texttt{git config -{}-global} настраивает автора
+для всех репозиториев пользователя, а применённое здесь
+\texttt{-{}-local} --- только для учебного каталога.
+
+\subsubsection*{Игнорирование и восстановление}
+
+Создайте два пробных файла и попробуйте добавить один из них в индекс:
+
+\begin{verbatim}
+printf 'temporary\n' > scratch.txt
+printf 'debug\n' > debug.log
+git add scratch.txt
+git status --short
+git rm --cached scratch.txt
+git status --short
+\end{verbatim}
+
+\texttt{git rm -{}-cached} удалил \texttt{scratch.txt} из \emph{индекса},
+но оставил файл на диске: он снова не отслеживается. Добавьте в уже
+созданный \texttt{.gitignore} две строки \texttt{/scratch.txt} и
+\texttt{*.log}. Убедитесь, что Git их игнорирует:
+
+\begin{verbatim}
+git check-ignore -v scratch.txt debug.log
+git status --short
+\end{verbatim}
+
+Файл \texttt{.gitignore} сам по себе отслеживается, поэтому его изменение
+появится в статусе. Правило игнорирования не удаляет файл с диска и не
+перестаёт отслеживать уже \emph{закоммиченный} файл автоматически.
+Теперь внесите пробную правку в отслеживаемый README и отмените её:
+
+\begin{verbatim}
+printf 'Trial line\n' >> README.md
+git diff -- README.md
+git restore README.md
+git status --short
+\end{verbatim}
+
+\texttt{git restore} без дополнительных флагов возвращает рабочую версию
+README к состоянию индекса: пробная строка пропадёт. Старый синтаксис
+\texttt{git checkout -{}- README.md} решает сходную задачу, но
+\texttt{git switch} удобнее для перехода между ветками. Не восстанавливайте
+этой командой изменения, которые хотите сохранить.
+
+\subsubsection*{Ветка и слияние}
+
+Ветка (branch) позволяет фиксировать отдельную линию изменений. Имя
+начальной ветки зависит от настроек Git, поэтому сохраните его в
+переменной Bash, затем создайте ветку для краткой заметки:
+
+\begin{verbatim}
+base_branch=$(git branch --show-current)
+git switch -c feature-notes
+git branch
+printf 'Git and processes\n' > notes.txt
+git add notes.txt .gitignore
+git diff --cached
+git commit -m "Add notes and ignore temporary files"
+git switch "$base_branch"
+git merge --no-ff feature-notes -m "Merge feature notes"
+git branch -d feature-notes
+git log --graph --oneline --all -6
+\end{verbatim}
+
+До слияния в исходной ветке не было \texttt{notes.txt}; после него файл
+появился. \texttt{git switch -c} создаёт ветку и переходит на неё,
+\texttt{git merge} переносит изменения, \texttt{git branch -d} удаляет
+уже влитую ветку. Флаг \texttt{-{}-no-ff} в примере сохраняет отдельный
+коммит слияния. Альтернатива \texttt{git switch} --- \texttt{git checkout}.
+
+\subsubsection*{Локальный удалённый репозиторий}
+
+Git умеет обмениваться коммитами без сайта и сети. Создайте рядом с
+\texttt{lab05} \emph{bare-репозиторий} --- место хранения истории без
+рабочих исходников. Для этого вернитесь в первый терминал и убедитесь,
+что находитесь в \texttt{\textasciitilde{}/aiya/lab05}:
+
+\begin{verbatim}
+pwd
+remote_dir="$HOME/aiya/lab05-remote.git"
+copy_dir="$HOME/aiya/lab05-copy"
+git init --bare "$remote_dir"
+git remote add origin "$remote_dir"
+git push -u origin "$base_branch"
+git clone -b "$base_branch" "$remote_dir" "$copy_dir"
+git -C "$copy_dir" log -1 --oneline
+\end{verbatim}
+
+\texttt{origin} --- имя связи с соседним репозиторием; это учебная модель
+удалённого репозитория, хотя оба каталога находятся на одной машине.
+\texttt{clone} создал независимую рабочую копию. Флаг \texttt{-b}
+выбирает сохранённую ветку даже тогда, когда настройка начальной ветки
+bare-репозитория отличается. При повторном выполнении используйте новые
+имена каталогов: Git не клонирует поверх существующего.
+
+В клоне сделайте и отправьте небольшую правку. Автор для этого второго
+рабочего каталога настраивается отдельно, если он не задан глобально:
+
+\begin{verbatim}
+git -C "$copy_dir" config --local user.name "Ваше имя"
+git -C "$copy_dir" config --local user.email "ваш адрес"
+printf 'Copied work\n' >> "$copy_dir/notes.txt"
+git -C "$copy_dir" add notes.txt
+git -C "$copy_dir" commit -m "Update note in clone"
+git -C "$copy_dir" push origin "$base_branch"
+git pull --ff-only origin "$base_branch"
+cat notes.txt
+\end{verbatim}
+
+Последние две команды выполняются в \emph{первом} каталоге
+\texttt{lab05}. Вторая строка появилась в нём после \texttt{pull}; флаг
+\texttt{-{}-ff-only} разрешает только прямое продвижение ветки. В отчёте
+объясните, где теперь лежат два рабочих каталога и история \texttt{origin}.
+
+\subsubsection*{Дополнительно: спрятать или отменить изменение}
+
+Следующие опыты не нужны для основного маршрута. Выполняйте их после
+обязательных шагов и \emph{не переписывайте историю основного каталога}.
+Для \texttt{stash} можно временно убрать незакоммиченную правку README
+и вернуть её:
+
+\begin{verbatim}
+printf 'Temporary note\n' >> README.md
+git stash push -m "Temporary note" -- README.md
+git status --short
+git stash pop
+git restore README.md
+\end{verbatim}
+
+Чтобы различить два способа отмены коммита, сначала сделайте отдельную
+копию для опытов (из \texttt{lab05}):
+
+\begin{verbatim}
+recovery_dir="$HOME/aiya/lab05-recovery"
+git clone . "$recovery_dir"
+git -C "$recovery_dir" config --local user.name "Ваше имя"
+git -C "$recovery_dir" config --local user.email "ваш адрес"
+printf 'Trial\n' >> "$recovery_dir/notes.txt"
+git -C "$recovery_dir" add notes.txt
+git -C "$recovery_dir" commit -m "Trial note"
+git -C "$recovery_dir" reset HEAD~1
+git -C "$recovery_dir" status --short
+\end{verbatim}
+
+\texttt{reset HEAD\textasciitilde{}1} передвигает ветку назад, но
+сохраняет пробную правку в рабочем файле. Сделайте из неё новый коммит
+и отмените его \texttt{revert}, который \emph{добавит} ещё один коммит:
+
+\begin{verbatim}
+git -C "$recovery_dir" add notes.txt
+git -C "$recovery_dir" commit -m "Trial again"
+git -C "$recovery_dir" revert --no-edit HEAD
+git -C "$recovery_dir" log -3 --oneline
+\end{verbatim}
+
+Команда \texttt{git reset -{}-hard} также стирает несохранённые изменения;
+в опыте она не требуется. \texttt{reset} меняет историю текущей ветки,
+а \texttt{revert} сохраняет прежние коммиты и создаёт новый.
+
+\subsection{Часть II. Коды возврата, процессы и изоляция}
+
+\subsubsection*{Соберите и запустите программы}
+
+\begin{verbatim}
+gcc -std=c11 -Wall -Wextra -O0 status_demo.c -o status_demo
+gcc -std=c11 -Wall -Wextra -O0 isolation_demo.c -o isolation_demo
+file status_demo isolation_demo
+git status --short
+\end{verbatim}
+
+\texttt{.c} --- исходный файл, \texttt{status\_demo} и
+\texttt{isolation\_demo} --- исполняемые файлы на диске. При запуске
+возникает процесс; после его завершения файл остаётся. \texttt{file}
+поможет увидеть тип файлов. Сборка создаёт ELF-файлы для вашей архитектуры;
+они не должны появиться в \texttt{git status -{}-short} благодаря
+\texttt{.gitignore}.
+
+\subsubsection*{Исследуйте код возврата и потоки}
+
+Каждую пару команд выполняйте подряд: \texttt{\$?} в Bash означает статус
+\emph{последней} завершённой команды и меняется после следующей команды.
+
+\begin{verbatim}
+./status_demo --code=0
+echo $?
+./status_demo --code=7
+echo $?
+./status_demo --code=oops
+echo $?
+\end{verbatim}
+
+В первом случае ожидается 0, во втором 7, при неверном аргументе --- 2 и
+сообщение в \texttt{stderr}. Для этой учебной программы допустимые явные
+коды 0--125: число 0 принято считать успешным завершением, ненулевое
+указывает на иной результат; смысл конкретного ненулевого кода задаёт
+программа. Исследуйте сохранение обычного вывода и диагностики отдельно:
+
+\begin{verbatim}
+./status_demo --code=7 > result.txt
+echo $?
+cat result.txt
+./status_demo --code=oops 2> error.txt
+echo $?
+cat error.txt
+\end{verbatim}
+
+В первом случае перенаправление вывода не меняет код 7; сообщение об ошибке
+во втором случае окажется в \texttt{error.txt}. После \texttt{cat} значение
+\texttt{\$?} уже относится к \texttt{cat}. Дополнительно проверьте ввод из
+файла и канал на готовых командах:
+
+\begin{verbatim}
+printf 'alpha\nbeta\n' > input.txt
+cat < input.txt | wc -l
+echo $?
+\end{verbatim}
+
+Ожидается две строки. Статус конвейера Bash без специальных настроек ---
+обычно статус \emph{последней} команды, здесь \texttt{wc}. Файлы
+\texttt{input.txt}, \texttt{result.txt},
+\texttt{error.txt} остаются только для опытов.
+
+Чтобы увидеть право исполнения, сначала запишите ожидаемый результат, затем
+проверьте и верните разрешение:
+
+\begin{verbatim}
+chmod -x status_demo
+./status_demo --code=0
+echo $?
+chmod +x status_demo
+./status_demo --code=0
+echo $?
+\end{verbatim}
+
+После снятия бита исполнения оболочка обычно сообщает об отказе в доступе;
+её статус ошибки не является кодом, который вернула \texttt{main} программы:
+она не была запущена. После восстановления права программа снова вернёт 0.
+Аналогично проверьте попытки запустить несуществующий путь
+\texttt{./no\_such\_program} и имя \texttt{status\_demo} без
+\texttt{./} (если текущий каталог не входит в \texttt{PATH}). Запишите
+сообщения оболочки и объясните отличие \texttt{no such file or directory}
+и \texttt{command not found} от кода, возвращённого самой C-программой.
+
+\subsubsection*{Родитель, потомок и отдельные значения}
+
+\begin{verbatim}
+./isolation_demo
+echo $?
+\end{verbatim}
+
+Программа вызывает \texttt{fork()}, создавая дочерний процесс. Оба
+печатают свои PID, числовое значение адреса локальной переменной и её
+значение. После запуска ребёнок меняет \texttt{value} с 41 на 99 и
+посылает родителю сигнал через pipe; родитель выводит значение \emph{после}
+изменения ребёнком. Ожидайте: разные PID, одинаковое число виртуального
+адреса в этом конкретном запуске, 99 у ребёнка и по-прежнему 41 у родителя.
+PID и само число адреса каждый раз могут меняться. \texttt{waitpid()}
+позволяет родителю узнать код ребёнка 7. При этом сама запущенная из Bash
+программа возвращает \texttt{0}: \texttt{echo \$?} показывает \emph{её},
+а не непосредственно дочерний код.
+
+Откройте \textbf{второй терминал}. В первом запустите
+\texttt{./isolation\_demo -{}-observe}: ребёнок останется работающим около
+8 секунд. Сразу перепишите напечатанный \texttt{child pid} и во втором
+терминале выполните (подставьте своё число):
+
+\begin{verbatim}
+ps -p 12345 -o pid,ppid,stat,comm
+\end{verbatim}
+
+Ожидается строка ребёнка с его PID и PID родителя в столбце PPID; если
+строки уже нет, повторите опыт и выполните \texttt{ps} быстрее. Не
+используйте PID из этой методички буквально. Два процесса могут разделять
+разрешённые ресурсы, например унаследованный открытый канал; наличие
+\texttt{pipe} не означает общей переменной \texttt{value}. Опыт показывает
+разделение обычной памяти родителя и потомка, \emph{но не доказывает}, что
+абсолютно любой доступ одного процесса к другому невозможен: ОС управляет
+правами и может разрешать общую память и специальные средства отладки.
+
+\subsubsection*{Измените исходник и зафиксируйте результат}
+
+Найдите в \texttt{isolation\_demo.c} присваивание ребёнку
+\texttt{value = 99;} и замените \texttt{99} на \texttt{73}. Снова соберите
+и запустите \texttt{isolation\_demo}; объясните, почему у родителя
+по-прежнему 41. Теперь проверьте различие между рабочим файлом и индексом:
+
+\begin{verbatim}
+git diff
+git add isolation_demo.c
+git diff --cached
+git commit -m "Change child value in isolation experiment"
+git log -2 --oneline
+git status --short
+\end{verbatim}
+
+В истории основного репозитория должны быть начальный коммит, коммит
+ветки, коммит слияния, правка из клона и итоговое изменение C-программы;
+собранные файлы и результаты запусков в неё не входят. Сохраните оба
+рабочих каталога и bare-репозиторий для показа
+преподавателю, не отправляйте в публичный репозиторий персональные данные.
+
+\subsection{Отчёт}
+
+Составьте \textbf{один отчёт} по обеим частям: цель, команды,
+краткий граф истории с начальным, веточным и итоговым C-коммитами;
+объяснение, что сделали \texttt{git rm -{}-cached},
+\texttt{git restore}, \texttt{merge}, \texttt{clone}, \texttt{push},
+\texttt{pull}; ожидаемые и фактические коды трёх запусков,
+различие stdout/stderr, PID и адреса родителя и ребёнка, значения до и
+после изменения, объяснение результата \texttt{ps}. Ответьте на вопросы:
+почему процесс не равен исполняемому файлу? Почему одинаковое число
+виртуального адреса не означает одну переменную? Чей код показывает
+\texttt{echo \$?} после \texttt{./isolation\_demo}? Почему наличие
+общего файлового ресурса не отменяет изоляцию обычной памяти?

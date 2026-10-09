@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 310" role="img" aria-labelledby="title desc">
+  <title id="title">Пока задание A ждёт ввод-вывод, процессор может выполнять B</title>
+  <desc id="desc">В последовательной очереди CPU простаивает при вводе-выводе A и лишь затем запускает B. При многопрограммной обработке CPU выполняет B одновременно с вводом-выводом A; A становится готовым и получает CPU позднее.</desc>
+  <g font-family="Carlito, sans-serif">
+    <g fill="#8bbcff" font-size="23" font-weight="700">
+      <text x="35" y="37">ПОСЛЕДОВАТЕЛЬНО</text>
+      <text x="35" y="180">НЕСКОЛЬКО ЗАДАНИЙ В ПАМЯТИ</text>
+    </g>
+    <g fill="#f0f4f8" font-size="20">
+      <text x="45" y="87">CPU</text><text x="45" y="127">Устройство</text>
+      <text x="45" y="230">CPU</text><text x="45" y="270">Устройство</text>
+    </g>
+    <g fill="#25283f" stroke="#8bbcff" stroke-width="2">
+      <rect x="245" y="59" width="145" height="37" rx="6"/>
+      <rect x="390" y="59" width="245" height="37" rx="6" stroke-dasharray="8 6"/>
+      <rect x="635" y="59" width="310" height="37" rx="6"/>
+      <rect x="390" y="99" width="245" height="37" rx="6"/>
+      <rect x="245" y="202" width="145" height="37" rx="6"/>
+      <rect x="390" y="202" width="310" height="37" rx="6" stroke="#00d4aa"/>
+      <rect x="700" y="202" width="245" height="37" rx="6"/>
+      <rect x="390" y="242" width="245" height="37" rx="6"/>
+    </g>
+    <g text-anchor="middle" font-size="20">
+      <text x="317" y="85" fill="#f0f4f8">A считает</text>
+      <text x="512" y="85" fill="#ffcf74">CPU простаивает</text>
+      <text x="790" y="85" fill="#f0f4f8">B считает</text>
+      <text x="512" y="125" fill="#8bbcff">ввод-вывод A</text>
+      <text x="317" y="228" fill="#f0f4f8">A считает</text>
+      <text x="545" y="228" fill="#00d4aa">B считает</text>
+      <text x="822" y="228" fill="#f0f4f8">A продолжает</text>
+      <text x="512" y="268" fill="#8bbcff">ввод-вывод A</text>
+    </g>
+    <path d="M635 242V196" stroke="#ffcf74" stroke-width="2" stroke-dasharray="5 5"/>
+    <text x="648" y="191" fill="#ffcf74" font-size="17">A готово</text>
+    <g fill="#8bbcff" font-size="17"><text x="247" y="299">Время →</text></g>
+  </g>
+</svg>

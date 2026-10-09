@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 310" role="img" aria-labelledby="title desc">
+  <title id="title">Разные виртуальные адресные пространства и защита памяти</title>
+  <desc id="desc">У процесса A виртуальный адрес 0x1000 отображается на физическую область A. Тот же виртуальный адрес процесса B отображается на другую область B. Попытка B обратиться к неразрешённой области A блокируется аппаратной защитой по правилам ОС; разрешённая общая память возможна отдельно.</desc>
+  <defs>
+    <marker id="vm-blue" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#8bbcff"/></marker>
+    <marker id="vm-green" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#00d4aa"/></marker>
+  </defs>
+  <g font-family="Carlito, sans-serif">
+    <g fill="#8bbcff" font-size="23" font-weight="700">
+      <text x="50" y="43">ВИРТУАЛЬНЫЕ АДРЕСА</text>
+      <text x="758" y="43">ФИЗИЧЕСКАЯ ПАМЯТЬ</text>
+    </g>
+    <g fill="#25283f" stroke-width="3">
+      <rect x="50" y="72" width="330" height="68" rx="9" stroke="#8bbcff"/>
+      <rect x="50" y="187" width="330" height="68" rx="9" stroke="#00d4aa"/>
+      <rect x="750" y="72" width="280" height="68" rx="9" stroke="#8bbcff"/>
+      <rect x="750" y="187" width="280" height="68" rx="9" stroke="#00d4aa"/>
+    </g>
+    <g fill="#f0f4f8" font-size="23">
+      <text x="75" y="113">A · адрес 0x1000</text>
+      <text x="75" y="228">B · адрес 0x1000</text>
+      <text x="778" y="113">область A</text>
+      <text x="778" y="228">область B</text>
+    </g>
+    <path d="M385 106H730" fill="none" stroke="#8bbcff" stroke-width="4" marker-end="url(#vm-blue)"/>
+    <path d="M385 221H730" fill="none" stroke="#00d4aa" stroke-width="4" marker-end="url(#vm-green)"/>
+    <text x="557" y="95" fill="#8bbcff" font-size="19" text-anchor="middle">правила A</text>
+    <text x="557" y="210" fill="#00d4aa" font-size="19" text-anchor="middle">правила B</text>
+    <path d="M385 241L630 142" fill="none" stroke="#ffcf74" stroke-width="3" stroke-dasharray="7 6"/>
+    <text x="652" y="156" fill="#ffcf74" font-size="33" font-weight="700">×</text>
+    <text x="50" y="298" fill="#ffcf74" font-size="20">Без разрешения B не может обратиться к области A</text>
+  </g>
+</svg>

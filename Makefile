@@ -5,11 +5,13 @@ PRACTICE := test1_practice.tex
 BUILD_DIR := build
 SLIDES_IMAGE := adaptation-course-slides
 LECTURE4_IMAGE := adaptation-course-lecture04
+LECTURE5_IMAGE := adaptation-course-lecture05
 JOURNAL_IMAGE := adaptation-course-journal
 SEMINAR4_C_IMAGE := adaptation-course-seminar04-c
+SEMINAR5_IMAGE := adaptation-course-seminar05
 STAGE ?= 6
 
-.PHONY: pdf pud-pdf practice-pdf clean docker-image slides-image lecture2-slides lecture2-original lecture2 lecture3-slides lecture3 lecture4-check lecture4-slides lecture4 lecture4-journal-check lecture4-journal-run lecture4-journal-slides lecture4-journal lecture4-quiz seminar4-factorial-check seminar4-handbook seminar4-teacher seminar4-materials seminar4 ubuntu-terminal-handbook ubuntu-terminal lab-report-handbook lab-report-check lab-report debian-install-handbook debian-install-check debian-install
+.PHONY: pdf pud-pdf practice-pdf grade-formula-pdf course-exam-announcement-pdf clean docker-image slides-image lecture2-slides lecture2-original lecture2 lecture3-slides lecture3 lecture4-check lecture4-slides lecture4 lecture5-check lecture5-slides lecture5 lecture4-journal-check lecture4-journal-run lecture4-journal-slides lecture4-journal lecture4-quiz seminar4-factorial-check seminar4-handbook seminar4-teacher seminar4-materials seminar4 seminar5-check seminar5-handbook seminar5-materials seminar5 ubuntu-terminal-handbook ubuntu-terminal lab-report-handbook lab-report-check lab-report debian-install-handbook debian-install-check debian-install
 
 docker-image:
 	docker build -t $(IMAGE) .
@@ -34,6 +36,20 @@ practice-pdf: docker-image
 		-w /workspace \
 		$(IMAGE) \
 		sh -c 'mkdir -p $(BUILD_DIR)/latex && latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=$(BUILD_DIR)/latex $(PRACTICE) && install -Dm644 $(BUILD_DIR)/latex/test1_practice.pdf $(BUILD_DIR)/pdf/test1_practice.pdf'
+
+grade-formula-pdf: docker-image
+	docker run --rm \
+		-v "$(CURDIR)":/workspace \
+		-w /workspace \
+		$(IMAGE) \
+		sh -c 'mkdir -p $(BUILD_DIR)/latex && latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=$(BUILD_DIR)/latex course_grade_formula.tex && install -Dm644 $(BUILD_DIR)/latex/course_grade_formula.pdf $(BUILD_DIR)/pdf/course_grade_formula.pdf'
+
+course-exam-announcement-pdf: docker-image
+	docker run --rm \
+		-v "$(CURDIR)":/workspace \
+		-w /workspace \
+		$(IMAGE) \
+		sh -c 'mkdir -p $(BUILD_DIR)/latex && latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=$(BUILD_DIR)/latex course_exam_announcement.tex && install -Dm644 $(BUILD_DIR)/latex/course_exam_announcement.pdf $(BUILD_DIR)/pdf/course_exam_announcement.pdf'
 
 slides-image:
 	docker build -t $(SLIDES_IMAGE) slides
@@ -73,6 +89,18 @@ lecture4-slides: slides-image
 		--entrypoint node $(SLIDES_IMAGE) slides/check-artifacts.mjs $(BUILD_DIR) lecture04
 
 lecture4: pdf lecture4-check lecture4-slides
+
+lecture5-check:
+	docker build -t $(LECTURE5_IMAGE) demos/lecture05
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace $(LECTURE5_IMAGE)
+
+lecture5-slides: slides-image
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
+		$(SLIDES_IMAGE) $(BUILD_DIR) lecture05
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
+		--entrypoint node $(SLIDES_IMAGE) slides/check-artifacts.mjs $(BUILD_DIR) lecture05
+
+lecture5: pdf lecture5-check lecture5-slides
 
 lecture4-journal-check:
 	docker build -t $(JOURNAL_IMAGE) demos/lecture04-journal
@@ -121,6 +149,23 @@ seminar4-materials: slides-image
 seminar4: pdf seminar4-handbook seminar4-materials seminar4-factorial-check
 	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
 		$(IMAGE) python3 scripts/check-seminar04-handbook.py $(BUILD_DIR)
+
+seminar5-check:
+	docker build -t $(SEMINAR5_IMAGE) demos/seminar05
+	docker run --rm -v "$(CURDIR)":/workspace:ro -w /workspace $(SEMINAR5_IMAGE)
+
+seminar5-handbook: docker-image
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
+		$(IMAGE) sh scripts/build-tex-handbook.sh seminar05 \
+		$(BUILD_DIR)/html/seminar05 $(BUILD_DIR)/pdf/seminar05/seminar05.pdf
+
+seminar5-materials: slides-image
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
+		--entrypoint node $(SLIDES_IMAGE) slides/materials.mjs $(BUILD_DIR) seminar05
+
+seminar5: pdf seminar5-handbook seminar5-materials seminar5-check
+	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \
+		$(IMAGE) python3 scripts/check-seminar05-handbook.py $(BUILD_DIR)
 
 ubuntu-terminal-handbook: docker-image
 	docker run --rm -v "$(CURDIR)":/workspace -w /workspace \

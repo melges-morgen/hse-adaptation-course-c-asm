@@ -29,7 +29,7 @@ jobs:
         run: python3 scripts/check-lecture02.py
 
       - name: Build course and lecture slides
-        run: make lecture2 lecture2-original lecture3 lecture4 lecture4-journal seminar4 ubuntu-terminal lab-report debian-install
+        run: make lecture2 lecture2-original lecture3 lecture4 lecture5 lecture4-journal seminar4 seminar5 ubuntu-terminal lab-report debian-install
 
       - name: Prepare build metadata
         env:
@@ -64,8 +64,10 @@ jobs:
           echo "LECTURE3_PDF_NAME=lecture03-slides-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "LECTURE4_PDF_NAME=lecture04-slides-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "JOURNAL_PDF_NAME=lecture04-journal-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+          echo "LECTURE5_PDF_NAME=lecture05-slides-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "SEMINAR4_PDF_NAME=seminar04-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "SEMINAR4_FACTORIAL_PDF_NAME=seminar04-factorial-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
+          echo "SEMINAR5_PDF_NAME=seminar05-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "UBUNTU_TERMINAL_PDF_NAME=ubuntu-terminal-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "DEMO_LAB_PDF_NAME=demo-lab-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
           echo "EXAMPLE_REPORT_PDF_NAME=example-report-${BUILD_VERSION}.pdf" >> "$GITHUB_ENV"
@@ -74,23 +76,28 @@ jobs:
 
       - name: Prepare PDF artifact
         run: |
-          mkdir -p dist/html dist/pdf/lecture02 dist/pdf/lecture03 dist/pdf/lecture04 dist/pdf/seminar04/factorial dist/pdf/ubuntu-terminal dist/pdf/lab-report dist/pdf/debian-install
+          mkdir -p dist/html dist/pdf/lecture02 dist/pdf/lecture03 dist/pdf/lecture04 dist/pdf/lecture05 dist/pdf/seminar04/factorial dist/pdf/seminar05 dist/pdf/ubuntu-terminal dist/pdf/lab-report dist/pdf/debian-install
           cp build/pdf/adaptation_course.pdf "dist/pdf/${PDF_NAME}"
           cp build/pdf/lecture02/lecture02-slides.pdf "dist/pdf/lecture02/${SLIDES_PDF_NAME}"
           cp build/pdf/lecture02/lecture02-original.pdf "dist/pdf/lecture02/${ORIGINAL_PDF_NAME}"
           cp build/pdf/lecture03/lecture03-slides.pdf "dist/pdf/lecture03/${LECTURE3_PDF_NAME}"
           cp build/pdf/lecture04/lecture04-slides.pdf "dist/pdf/lecture04/${LECTURE4_PDF_NAME}"
           cp build/pdf/lecture04/lecture04-journal.pdf "dist/pdf/lecture04/${JOURNAL_PDF_NAME}"
+          cp build/pdf/lecture05/lecture05-slides.pdf "dist/pdf/lecture05/${LECTURE5_PDF_NAME}"
           cp build/pdf/seminar04/seminar04.pdf "dist/pdf/seminar04/${SEMINAR4_PDF_NAME}"
           cp build/pdf/seminar04/seminar04-factorial.pdf "dist/pdf/seminar04/${SEMINAR4_FACTORIAL_PDF_NAME}"
+          cp build/pdf/seminar05/seminar05.pdf "dist/pdf/seminar05/${SEMINAR5_PDF_NAME}"
           cp build/pdf/ubuntu-terminal/ubuntu-terminal.pdf "dist/pdf/ubuntu-terminal/${UBUNTU_TERMINAL_PDF_NAME}"
           cp build/pdf/lab-report/demo-lab.pdf "dist/pdf/lab-report/${DEMO_LAB_PDF_NAME}"
           cp build/pdf/lab-report/example-report.pdf "dist/pdf/lab-report/${EXAMPLE_REPORT_PDF_NAME}"
           cp build/pdf/debian-install/debian-install.pdf "dist/pdf/debian-install/${DEBIAN_INSTALL_PDF_NAME}"
           cp -R build/pdf/lecture04/materials dist/pdf/lecture04/materials
+          cp -R build/pdf/lecture05/materials dist/pdf/lecture05/materials
           cp -R build/pdf/seminar04/materials dist/pdf/seminar04/materials
           cp -R build/pdf/seminar04/factorial/materials dist/pdf/seminar04/factorial/materials
-          python3 -c 'import os, shutil; name=os.environ["BUILD_VERSION"]; shutil.make_archive("dist/pdf/lecture04/lecture04-materials-" + name, "zip", "build/pdf/lecture04/materials"); shutil.make_archive("dist/pdf/seminar04/seminar04-materials-" + name, "zip", "build/pdf/seminar04/materials"); shutil.make_archive("dist/pdf/seminar04/seminar04-factorial-materials-" + name, "zip", "build/pdf/seminar04/factorial/materials")'
+          cp -R build/pdf/seminar05/materials dist/pdf/seminar05/materials
+          python3 -c 'import os, shutil; name=os.environ["BUILD_VERSION"]; shutil.make_archive("dist/pdf/lecture04/lecture04-materials-" + name, "zip", "build/pdf/lecture04/materials"); shutil.make_archive("dist/pdf/lecture05/lecture05-materials-" + name, "zip", "build/pdf/lecture05/materials"); shutil.make_archive("dist/pdf/seminar04/seminar04-materials-" + name, "zip", "build/pdf/seminar04/materials"); shutil.make_archive("dist/pdf/seminar04/seminar04-factorial-materials-" + name, "zip", "build/pdf/seminar04/factorial/materials")'
+          python3 -c 'import os, shutil; name=os.environ["BUILD_VERSION"]; shutil.make_archive("dist/pdf/seminar05/seminar05-materials-" + name, "zip", "build/pdf/seminar05/materials")'
           python3 -c 'import os, shutil; shutil.make_archive("dist/html/" + os.environ["HTML_ZIP_NAME"][:-4], "zip", "build/html")'
 
       - name: Upload PDF artifact
@@ -102,23 +109,28 @@ jobs:
       - name: Prepare Pages artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          mkdir -p public/pdf/lecture02 public/pdf/lecture03 public/pdf/lecture04 public/pdf/seminar04/factorial public/pdf/ubuntu-terminal public/pdf/lab-report public/pdf/debian-install
+          mkdir -p public/pdf/lecture02 public/pdf/lecture03 public/pdf/lecture04 public/pdf/lecture05 public/pdf/seminar04/factorial public/pdf/seminar05 public/pdf/ubuntu-terminal public/pdf/lab-report public/pdf/debian-install
           cp build/pdf/adaptation_course.pdf public/pdf/adaptation_course.pdf
           cp build/pdf/lecture02/lecture02-slides.pdf public/pdf/lecture02/
           cp build/pdf/lecture02/lecture02-original.pdf public/pdf/lecture02/
           cp build/pdf/lecture03/lecture03-slides.pdf public/pdf/lecture03/
           cp build/pdf/lecture04/lecture04-slides.pdf public/pdf/lecture04/
           cp build/pdf/lecture04/lecture04-journal.pdf public/pdf/lecture04/
+          cp build/pdf/lecture05/lecture05-slides.pdf public/pdf/lecture05/
           cp build/pdf/seminar04/seminar04.pdf public/pdf/seminar04/
           cp build/pdf/seminar04/seminar04-factorial.pdf public/pdf/seminar04/
+          cp build/pdf/seminar05/seminar05.pdf public/pdf/seminar05/
           cp build/pdf/ubuntu-terminal/ubuntu-terminal.pdf public/pdf/ubuntu-terminal/
           cp build/pdf/lab-report/demo-lab.pdf public/pdf/lab-report/
           cp build/pdf/lab-report/example-report.pdf public/pdf/lab-report/
           cp build/pdf/debian-install/debian-install.pdf public/pdf/debian-install/
           cp -R build/pdf/lecture04/materials public/pdf/lecture04/materials
+          cp -R build/pdf/lecture05/materials public/pdf/lecture05/materials
           cp -R build/pdf/seminar04/materials public/pdf/seminar04/materials
           cp -R build/pdf/seminar04/factorial/materials public/pdf/seminar04/factorial/materials
-          python3 -c 'import shutil; shutil.make_archive("public/pdf/lecture04/lecture04-materials", "zip", "build/pdf/lecture04/materials"); shutil.make_archive("public/pdf/seminar04/seminar04-materials", "zip", "build/pdf/seminar04/materials"); shutil.make_archive("public/pdf/seminar04/seminar04-factorial-materials", "zip", "build/pdf/seminar04/factorial/materials")'
+          cp -R build/pdf/seminar05/materials public/pdf/seminar05/materials
+          python3 -c 'import shutil; shutil.make_archive("public/pdf/lecture04/lecture04-materials", "zip", "build/pdf/lecture04/materials"); shutil.make_archive("public/pdf/lecture05/lecture05-materials", "zip", "build/pdf/lecture05/materials"); shutil.make_archive("public/pdf/seminar04/seminar04-materials", "zip", "build/pdf/seminar04/materials"); shutil.make_archive("public/pdf/seminar04/seminar04-factorial-materials", "zip", "build/pdf/seminar04/factorial/materials")'
+          python3 -c 'import shutil; shutil.make_archive("public/pdf/seminar05/seminar05-materials", "zip", "build/pdf/seminar05/materials")'
           cp -R build/html public/html
           cat > public/index.html <<'HTML'
           <!doctype html>
@@ -160,6 +172,14 @@ jobs:
               <li><a href="html/lecture04/journal/">Презентация Reveal.js</a></li>
               <li><a href="pdf/lecture04/lecture04-journal.pdf">Презентация в PDF</a></li>
             </ul>
+            <h2>Лекция №5. Операционная система и запуск программы</h2>
+            <p>История пакетных систем, Unix и Windows; путь от команды shell до процесса, стандартные потоки и код завершения.</p>
+            <ul>
+              <li><a href="html/lecture05/">Презентация Reveal.js</a></li>
+              <li><a href="pdf/lecture05/lecture05-slides.pdf">Презентация в PDF</a></li>
+              <li><a href="html/lecture05/materials/README.md">Материалы и инструкция запуска</a></li>
+              <li><a href="pdf/lecture05/lecture05-materials.zip">Скачать материалы к PDF</a></li>
+            </ul>
             <h2>Семинар №4. Лабораторная работа на выбор</h2>
             <p>Выберите и защитите один из двух вариантов. Задания, не выполненные в аудитории, завершаются дома.</p>
             <h3>Вариант 1 (базовый): факториал на C</h3>
@@ -175,6 +195,14 @@ jobs:
               <li><a href="pdf/seminar04/seminar04.pdf">Методичка: PDF для печати</a></li>
               <li><a href="html/seminar04/materials/README.md">Состав материалов для практики</a></li>
               <li><a href="pdf/seminar04/seminar04-materials.zip">Скачать материалы к PDF</a></li>
+            </ul>
+            <h2>Лабораторная работа №5. Git и процессы</h2>
+            <p>Сначала локальный Git, затем коды возврата и изоляция процессов в Linux.</p>
+            <ul>
+              <li><a href="html/seminar05/">Методичка: читать в браузере</a></li>
+              <li><a href="pdf/seminar05/seminar05.pdf">Методичка: PDF для печати</a></li>
+              <li><a href="html/seminar05/materials/README.md">Состав материалов</a></li>
+              <li><a href="pdf/seminar05/seminar05-materials.zip">Скачать материалы к PDF</a></li>
             </ul>
             <h2>Дополнительные материалы</h2>
             <h3>Установка Debian и знакомство с терминалом</h3>
@@ -218,4 +246,4 @@ jobs:
         if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" "dist/pdf/${PDF_NAME}" "dist/pdf/lecture02/${SLIDES_PDF_NAME}" "dist/pdf/lecture02/${ORIGINAL_PDF_NAME}" "dist/pdf/lecture03/${LECTURE3_PDF_NAME}" "dist/pdf/lecture04/${LECTURE4_PDF_NAME}" "dist/pdf/lecture04/${JOURNAL_PDF_NAME}" "dist/pdf/lecture04/lecture04-materials-${BUILD_VERSION}.zip" "dist/pdf/seminar04/${SEMINAR4_PDF_NAME}" "dist/pdf/seminar04/${SEMINAR4_FACTORIAL_PDF_NAME}" "dist/pdf/seminar04/seminar04-materials-${BUILD_VERSION}.zip" "dist/pdf/seminar04/seminar04-factorial-materials-${BUILD_VERSION}.zip" "dist/pdf/ubuntu-terminal/${UBUNTU_TERMINAL_PDF_NAME}" "dist/pdf/lab-report/${DEMO_LAB_PDF_NAME}" "dist/pdf/lab-report/${EXAMPLE_REPORT_PDF_NAME}" "dist/pdf/debian-install/${DEBIAN_INSTALL_PDF_NAME}" "dist/html/${HTML_ZIP_NAME}" --clobber
+        run: gh release upload "${{ github.event.release.tag_name }}" "dist/pdf/${PDF_NAME}" "dist/pdf/lecture02/${SLIDES_PDF_NAME}" "dist/pdf/lecture02/${ORIGINAL_PDF_NAME}" "dist/pdf/lecture03/${LECTURE3_PDF_NAME}" "dist/pdf/lecture04/${LECTURE4_PDF_NAME}" "dist/pdf/lecture04/${JOURNAL_PDF_NAME}" "dist/pdf/lecture04/lecture04-materials-${BUILD_VERSION}.zip" "dist/pdf/lecture05/${LECTURE5_PDF_NAME}" "dist/pdf/lecture05/lecture05-materials-${BUILD_VERSION}.zip" "dist/pdf/seminar04/${SEMINAR4_PDF_NAME}" "dist/pdf/seminar04/${SEMINAR4_FACTORIAL_PDF_NAME}" "dist/pdf/seminar04/seminar04-materials-${BUILD_VERSION}.zip" "dist/pdf/seminar04/seminar04-factorial-materials-${BUILD_VERSION}.zip" "dist/pdf/seminar05/${SEMINAR5_PDF_NAME}" "dist/pdf/seminar05/seminar05-materials-${BUILD_VERSION}.zip" "dist/pdf/ubuntu-terminal/${UBUNTU_TERMINAL_PDF_NAME}" "dist/pdf/lab-report/${DEMO_LAB_PDF_NAME}" "dist/pdf/lab-report/${EXAMPLE_REPORT_PDF_NAME}" "dist/pdf/debian-install/${DEBIAN_INSTALL_PDF_NAME}" "dist/html/${HTML_ZIP_NAME}" --clobber

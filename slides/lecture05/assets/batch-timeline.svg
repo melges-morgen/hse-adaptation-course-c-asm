@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 310" role="img" aria-labelledby="title desc">
+  <title id="title">Пакетная модель: системный монитор управляет очередью</title>
+  <desc id="desc">Пользователь заранее сдаёт пакетной системе очередь A, B, C. Системный управляющий monitor, а не пользовательская оболочка, выбирает шаги, загружает и запускает их, получает статус и результат, затем выдаёт отчёт после обработки.</desc>
+  <defs>
+    <marker id="arrow-accent" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#00d4aa"/></marker>
+    <marker id="arrow-blue" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#8bbcff"/></marker>
+  </defs>
+
+  <g fill="#8bbcff" font-family="Carlito, sans-serif" font-size="24" font-weight="700">
+    <text x="108" y="38">USER</text>
+    <text x="370" y="38">BATCH SYSTEM / MONITOR</text>
+    <text x="854" y="38">JOB STEP</text>
+    <text x="30" y="180" transform="rotate(-90 30 180)">Время</text>
+  </g>
+
+  <path d="M150 52V292M520 52V292M910 52V292" fill="none" stroke="#8bbcff" stroke-width="3" stroke-dasharray="8 8"/>
+
+  <path d="M158 78H508" fill="none" stroke="#00d4aa" stroke-width="4" marker-end="url(#arrow-accent)"/>
+  <text x="333" y="68" fill="#00d4aa" font-family="Carlito, sans-serif" font-size="20" text-anchor="middle">сдать очередь A, B, C заранее</text>
+
+  <path d="M528 126H885" fill="none" stroke="#00d4aa" stroke-width="4" marker-end="url(#arrow-accent)"/>
+  <text x="707" y="115" fill="#00d4aa" font-family="Carlito, sans-serif" font-size="20" text-anchor="middle">monitor выбирает и запускает A</text>
+  <rect x="780" y="135" width="250" height="46" rx="8" fill="#25283f" stroke="#00d4aa" stroke-width="3"/>
+  <text x="905" y="165" fill="#f0f4f8" font-family="Carlito, sans-serif" font-size="23" text-anchor="middle">A выполняется</text>
+
+  <path d="M900 211H530" fill="none" stroke="#8bbcff" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="715" y="201" fill="#8bbcff" font-family="Carlito, sans-serif" font-size="21" text-anchor="middle">status + результат шага A</text>
+
+  <path d="M528 239H885" fill="none" stroke="#00d4aa" stroke-width="4" marker-end="url(#arrow-accent)"/>
+  <text x="707" y="229" fill="#00d4aa" font-family="Carlito, sans-serif" font-size="20" text-anchor="middle">монитор сам запускает B</text>
+  <path d="M510 276H158" fill="none" stroke="#8bbcff" stroke-width="4" marker-end="url(#arrow-blue)"/>
+  <text x="333" y="267" fill="#8bbcff" font-family="Carlito, sans-serif" font-size="20" text-anchor="middle">отчёт пользователю — после очереди</text>
+</svg>

@@ -44,8 +44,8 @@ for marker in (
     assert all(marker in edition for edition in editions), f"Missing {marker!r} in an edition"
 
 course = editions[2]
-assert course.index("Дополнительные материалы", course.index("Основы Git")) < course.index(
-    "Используемая литература", course.index("Дополнительные материалы", course.index("Основы Git"))
+assert course.index("Дополнительные материалы", course.index("Часть I. Первый локальный репозиторий Git")) < course.index(
+    "Используемая литература", course.index("Дополнительные материалы", course.index("Часть I. Первый локальный репозиторий Git"))
 ), "Supplementary materials must precede references"
 
 info = subprocess.check_output(["pdfinfo", str(pdf_path)], text=True)

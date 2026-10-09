@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 310" role="img" aria-labelledby="title desc">
+  <title id="title">Без защиты программа B может испортить данные A</title>
+  <desc id="desc">Учебная модель без защиты памяти. Программы A и B обращаются к общей доступной памяти. Данные A расположены по адресу 0x1200; ошибочная или намеренная запись B по этому адресу меняет данные A.</desc>
+  <defs>
+    <marker id="risk-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#ffcf74"/></marker>
+  </defs>
+  <g font-family="Carlito, sans-serif">
+    <text x="35" y="40" fill="#8bbcff" font-size="24" font-weight="700">УЧЕБНАЯ МОДЕЛЬ · БЕЗ ЗАЩИТЫ ПАМЯТИ</text>
+    <g fill="#25283f" stroke-width="3">
+      <rect x="65" y="75" width="290" height="70" rx="10" stroke="#8bbcff"/>
+      <rect x="65" y="190" width="290" height="70" rx="10" stroke="#00d4aa"/>
+      <rect x="690" y="75" width="320" height="185" rx="10" stroke="#8bbcff"/>
+      <rect x="710" y="140" width="280" height="53" rx="6" stroke="#ffcf74"/>
+    </g>
+    <g fill="#f0f4f8" font-size="24">
+      <text x="95" y="118">Программа A</text>
+      <text x="95" y="234">Программа B</text>
+      <text x="720" y="115">Общая память</text>
+      <text x="728" y="174">0x1200 · данные A</text>
+      <text x="725" y="233">0x2400 · данные B</text>
+    </g>
+    <path d="M355 110H685" stroke="#8bbcff" stroke-width="4" fill="none"/>
+    <text x="520" y="100" fill="#8bbcff" font-size="19" text-anchor="middle">A сохраняет данные</text>
+    <path d="M355 222H490V166H700" stroke="#ffcf74" stroke-width="4" fill="none" marker-end="url(#risk-arrow)"/>
+    <text x="520" y="248" fill="#ffcf74" font-size="19" text-anchor="middle">B пишет по 0x1200</text>
+    <text x="65" y="298" fill="#ffcf74" font-size="20">Ошибка указателя или намеренная запись → данные A повреждены</text>
+  </g>
+</svg>

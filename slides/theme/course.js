@@ -6,9 +6,13 @@ sections.forEach((section, index) => {
   const footer = document.createElement('div');
   footer.className = 'slide-footer';
   const label = document.createElement('span');
+  const block = section.dataset.block || 'Кодирование данных и команд';
+  const visibleBlock = document.body.hasAttribute('data-footer-hide-timing')
+    ? block.replace(/\s*·\s*\d+(?:[–-]\d+)?\s*мин$/, '')
+    : block;
   label.textContent = section.classList.contains('supplement')
     ? `Дополнительно · ${document.body.dataset.supplementLabel || 'арифметика и точность'}`
-    : `${lectureLabel} · ${section.dataset.block || 'Кодирование данных и команд'}`;
+    : `${lectureLabel} · ${visibleBlock}`;
   const number = document.createElement('span');
   number.textContent = `${String(index + 1).padStart(2, '0')} / ${sections.length}`;
   footer.append(label, number);

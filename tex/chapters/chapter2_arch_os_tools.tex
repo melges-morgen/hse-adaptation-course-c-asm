@@ -17,71 +17,17 @@
 \newpage
 \chapter{Тема №4. Операционная система и запуск программы.}
 \section{Лекция №5. Операционная система и запуск программы.}
-
-\subsection*{Цель занятия}
-Объяснить, зачем нужна операционная система и что происходит между запуском исполняемого файла и выполнением инструкций процессором.
-
-\subsection*{Обязательные темы}
-\begin{itemize}
-    \item Задачи операционной системы: процессы, память, файлы, устройства, права доступа.
-    \item Программа как файл на диске и процесс как выполняющийся экземпляр программы.
-    \item Загрузка программы в память и передача управления начальной точке исполнения.
-    \item Аргументы командной строки и переменные окружения.
-    \item Стандартные потоки: \texttt{stdin}, \texttt{stdout}, \texttt{stderr}.
-    \item Код завершения программы.
-    \item Права доступа к файлам и исполняемый бит.
-    \item Отличия Windows, Linux и macOS с точки зрения программиста.
-\end{itemize}
-
-\subsection*{Усложнённые темы}
-\begin{itemize}
-    \item Формат исполняемых файлов ELF.
-    \item Системные вызовы как интерфейс между программой и ОС.
-    \item Пользовательский режим и режим ядра.
-    \item Изоляция процессов и виртуальное адресное пространство.
-    \item Динамическая загрузка библиотек на уровне общей идеи.
-\end{itemize}
-
-\subsection*{Ключевые технологии и понятия}
-\begin{itemize}
-    \item Linux process model.
-    \item ELF, loader, syscall.
-    \item \texttt{file}, \texttt{chmod}, \texttt{./program}, \texttt{echo \$?}.
-    \item \texttt{ps}, \texttt{top}, \texttt{strace} как дополнительные инструменты наблюдения.
-\end{itemize}
+\begingroup
+\setlength{\emergencystretch}{2em}
+\input{tex/lectures/lecture05_os_launch}
+\endgroup
 
 \newpage
-\section{Семинар №5. Процессы, файлы и стандартные потоки в Linux.}
-
-\subsection*{Цель занятия}
-Научиться запускать программы в Linux, понимать базовые ошибки запуска и пользоваться стандартными потоками ввода-вывода.
-
-\subsection*{Обязательные задания}
-\begin{itemize}
-    \item Запустить готовую программу из текущего каталога через \texttt{./program}.
-    \item Проверить тип файла командой \texttt{file}.
-    \item Сделать файл исполняемым с помощью \texttt{chmod +x}.
-    \item Передать программе аргументы командной строки.
-    \item Перенаправить вывод в файл с помощью \texttt{>}.
-    \item Передать файл на вход программе с помощью \texttt{<}.
-    \item Соединить две команды через пайп \texttt{|}.
-    \item Проверить код завершения последней команды через \texttt{echo \$?}.
-\end{itemize}
-
-\subsection*{Усложнённые задания}
-\begin{itemize}
-    \item Найти запущенный процесс через \texttt{ps}.
-    \item Посмотреть системные вызовы простой программы через \texttt{strace}.
-    \item Диагностировать ошибки \texttt{permission denied}, \texttt{command not found}, \texttt{no such file or directory}.
-    \item Сравнить обычный вывод и поток ошибок при перенаправлении.
-\end{itemize}
-
-\subsection*{Ключевые технологии и понятия}
-\begin{itemize}
-    \item \texttt{stdin}, \texttt{stdout}, \texttt{stderr}.
-    \item Exit code.
-    \item \texttt{chmod}, \texttt{ps}, \texttt{strace}.
-\end{itemize}
+\section{Семинар №5. Лабораторная работа: Git и процессы в Linux.}
+\begingroup
+\setlength{\emergencystretch}{2em}
+\input{tex/seminars/seminar05_body.tex}
+\endgroup
 
 \newpage
 \chapter{Тема №5. Linux как рабочая среда программиста.}
@@ -222,74 +168,4 @@
     \item \texttt{nasm -f elf64}.
     \item \texttt{make}, \texttt{Makefile}, цель сборки.
     \item Object file, executable file, linker error.
-\end{itemize}
-
-\newpage
-\chapter{Тема №7. Основы Git и командной разработки.}
-\section{Лекция №8. Система контроля версий Git.}
-
-\subsection*{Цель занятия}
-Объяснить, зачем программисту система контроля версий, и дать модель Git, достаточную для учебных проектов и домашних заданий.
-
-\subsection*{Обязательные темы}
-\begin{itemize}
-    \item Зачем нужна система контроля версий.
-    \item Репозиторий, рабочая директория, индекс, коммит.
-    \item История изменений и идентификатор коммита.
-    \item Локальный и удалённый репозиторий.
-    \item Ветка как линия разработки.
-    \item Что такое конфликт и почему он возникает.
-    \item Минимальная дисциплина работы: маленькие коммиты, понятные сообщения, не коммитить артефакты сборки.
-\end{itemize}
-
-\subsection*{Усложнённые темы}
-\begin{itemize}
-    \item Merge и rebase на уровне идеи.
-    \item Pull request / merge request как способ проверки изменений.
-    \item \texttt{.gitignore} и исключение временных файлов.
-    \item Работа с несколькими ветками.
-    \item Как читать \texttt{git diff} перед коммитом.
-\end{itemize}
-
-\subsection*{Ключевые технологии и понятия}
-\begin{itemize}
-    \item Git.
-    \item GitHub или GitLab как удалённый хостинг репозиториев.
-    \item Commit, branch, remote, conflict.
-    \item \texttt{.gitignore}.
-\end{itemize}
-
-\newpage
-\section{Семинар №8. Минимальный рабочий цикл Git.}
-
-\subsection*{Цель занятия}
-Отработать базовый цикл работы с репозиторием: изменить файл, проверить изменения, сделать коммит и отправить его в удалённый репозиторий.
-
-\subsection*{Обязательные задания}
-\begin{itemize}
-    \item Создать локальный репозиторий командой \texttt{git init}.
-    \item Проверить состояние рабочей директории командой \texttt{git status}.
-    \item Добавить файл в индекс командой \texttt{git add}.
-    \item Сделать коммит командой \texttt{git commit}.
-    \item Посмотреть историю через \texttt{git log}.
-    \item Посмотреть изменения через \texttt{git diff}.
-    \item Склонировать удалённый репозиторий командой \texttt{git clone}.
-    \item Получить и отправить изменения через \texttt{git pull} и \texttt{git push}.
-\end{itemize}
-
-\subsection*{Усложнённые задания}
-\begin{itemize}
-    \item Создать ветку и переключиться на неё с помощью \texttt{git branch} и \texttt{git switch}.
-    \item Слить ветку обратно в основную.
-    \item Создать учебный конфликт и разрешить его вручную.
-    \item Написать \texttt{.gitignore} для проекта на C.
-    \item Проверить изменения перед коммитом и убрать из коммита лишние файлы.
-\end{itemize}
-
-\subsection*{Ключевые технологии и понятия}
-\begin{itemize}
-    \item \texttt{git init}, \texttt{git status}, \texttt{git add}, \texttt{git commit}.
-    \item \texttt{git log}, \texttt{git diff}.
-    \item \texttt{git clone}, \texttt{git pull}, \texttt{git push}.
-    \item \texttt{git branch}, \texttt{git switch}, \texttt{git merge}.
 \end{itemize}
