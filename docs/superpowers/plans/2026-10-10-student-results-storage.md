@@ -13,7 +13,7 @@
 - Semester names: `YYYY-spring` or `YYYY-autumn` (calendar year of the semester).
 - Directory hierarchy: `results/<semester>/<group>/<assessment>/source/` and `reports/`.
 - `results/` is entirely excluded from Git, including documentation placed inside it.
-- No student submissions; no moves or edits to `groups/`, `dist/`, `assessments/`, or `scripts/`.
+- Student reports may be inputs; exclude program sources and other student submissions. No moves or edits to `groups/`, `dist/`, `assessments/`, or `scripts/` in this storage-only task.
 
 ---
 

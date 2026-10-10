@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Source: `results/2026-autumn/ЛБ-4-ведомость-защиты-с-итогом.ods` and `groups/students.csv`.
+- Source: `results/2026-autumn/ЛБ-4-ведомость-защиты-актуальная.ods` and local `groups/students.csv`.
 - Scope: BPI264 only; 32 students, exclude BPI261.
 - Grade categories: 0–3 «неуд.», 4–5 «удовл.», 6–7 «хор.», 8–10 «отл.».
 - `results/` is ignored by Git; no personal data or generated PDF outside it.
