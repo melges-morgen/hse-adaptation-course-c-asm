@@ -35,6 +35,12 @@ The materials are written in Russian. Keep the language of course content Russia
   delivered and is built and published alongside the main presentation.
 - `examples/` contains external methodological examples and is not a source of
   course requirements.
+- `results/` is local, Git-ignored storage for grade sheets and reports, organized
+  as `results/YYYY-spring|YYYY-autumn/<group>/<assessment>/source/` for input
+  sheets and `reports/` for processed sheets and reports. The year is the calendar
+  year of the semester. Keep student submissions and shared generators out of
+  this tree; the latter remain in `scripts/` and `assessments/`. See
+  `docs/student-results.md` for the full layout and usage rules.
 - `demos/lecture04/` contains executable C/NASM examples for lecture 4;
   `make lecture4-check` verifies them in a Linux x86-64 Docker container.
 - `slides/lecture04-journal/` presents computer architecture through a

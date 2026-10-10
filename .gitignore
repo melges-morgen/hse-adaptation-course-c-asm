@@ -1,6 +1,7 @@
 build/
 work/
 dist/
+results/
 *.aux
 *.log
 *.toc
